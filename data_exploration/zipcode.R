@@ -41,14 +41,27 @@ monthly_count <- visit %>%
 
 # AMELIA WORKED FROM HERE ----------------------
 # exploring the zipcode variable 
-# How often did each zipcode visit?
+# How often did each zipcode visit? how many unique households
 
 zipcode_counts <- visit %>%
-  group_by(zip) %>%
-  summarise(zipcode_visits = n())
+  group_by(substr(zip,1,5)) %>%
+  summarise(zipcode_visits = n(),
+            unique_households=length(unique(afn)))
+colnames(zipcode_counts)<-c("zip","zipcode_visits","unique_households")
 
 zipcode_counts <- zipcode_counts[order(-zipcode_counts$zipcode_visits),]
 
-sum(zipcode_counts$zipcode_visits < 50) 
-#136 zip codes have only had 136 all together
+summary(zipcode_counts)
+
+sum(zipcode_counts$unique_households < 10) 
+#145 zip codes have only had 10 families, let's delete those (for privacy)
+
+zipcode_counts <- filter(zipcode_counts, unique_households > 10)
+
+summary(zipcode_counts) #there are 104 zip codes, including one " "
+
+hist(zipcode_counts$unique_households) #very right skewed, long right tail
+#most zipcodes are in the 0-1000 range
+#this is counts for ALL the months, 
+#but I can also do this for each individual month instead
 
