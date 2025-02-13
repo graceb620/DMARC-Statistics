@@ -50,8 +50,6 @@ monthly_count <- visit %>%
   summarise(num_VISITS = n(), #num rows (visits)
             num_PEOPLE_SERVED = sum(n_household) # number of people that month
             ) 
-
-#slay 
   
 
 
