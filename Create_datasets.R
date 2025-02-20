@@ -16,6 +16,7 @@ rm(list=ls())
 
 library(lubridate)
 library(tidyverse)
+library(dplyr)
 
 # Create the main dataset from raw csv -----------------------------------------
 all <- read.csv("Data/drake_export_v8_2024-02-13_100754_rev2_nolatlong.csv")
@@ -35,7 +36,8 @@ visit <- all %>%
   # in summarize, you need to really think about how to characterize a visit
   summarise( #ADD MORE HERE
     n_household = n(), #counts the number of rows within each afn, served_date
-    zip = first(zip) #zip code per household during visit
+    zip = first(zip), #zip code per household during visit
+    first_visit = min(served_date) # First visit date
   ) %>% 
   mutate (
     served_year = year(served_date),
@@ -90,6 +92,33 @@ print(week_day_counts)
 
 ##But there's 57 dates that failed to parse when we were cleaning dates
 
+## Create hh level dataset ---------------
+hh_data <- all %>% 
+  group_by(afn) %>% 
+  summarize(
+    n_household = n(),
+    first_visit = min(served_date),
+    first_visit_2023 = if_else(year(first_visit) == 2023, 1, 0)
+    ) 
+
+# Verify that it only found 2023 first visits
+hh_data %>%
+  count(first_visit_2023, name = "count")
+
+yearly_counts <- hh_data %>%
+  mutate(year = year(first_visit)) %>%
+  count(year, name = "count")
+
+print(yearly_counts)
+# 2023 yearly_count matches the count of 1 for first_visit_2023
+
+# Graph the First Visits per household
+ggplot(hh_data, aes(x = first_visit)) +
+  geom_density(fill = "blue", alpha = 0.5) +
+  labs(title = "Density of First Visits Over Time Per Household",
+       x = "First Visit Date",
+       y = "Density") 
+  
 
 
 
