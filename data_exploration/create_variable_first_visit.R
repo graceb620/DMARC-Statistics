@@ -37,6 +37,9 @@ ggplot(visit, aes(x = first_visit)) +
        x = "First Visit Date",
        y = "Density") 
 
+ggplot(visit, aes(x = first_visit)) + 
+  geom_histogram()
+
 # OBSERVATIONS: 
 # There appear to be a lot of first visits in late 2023.
 #   Possibly due to inflation? 
