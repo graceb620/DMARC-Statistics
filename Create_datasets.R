@@ -53,15 +53,17 @@ monthly_count <- visit %>%
   
 #creating monthly frequency variable
 
-monthly_prep <- visit %>% 
+monthly_household_frequency <- visit %>% 
   group_by(round_month,afn)  %>% 
   summarise(freq=n(),
             num_PEOPLE_SERVED = sum(n_household), 
             num_households = length(unique(afn)),
             
-  )
+  )%>% 
+  mutate(FREQ=ifelse(freq > 1,1,0)) 
+#this will help us if we want to analyze on a house-level
 
-monthly_frequency <- monthly_prep %>%
+monthly_total_frequency <- monthly_prep %>%
   group_by(round_month) %>% 
   mutate(FREQ=ifelse(freq > 1,1,0)) %>%  
   #if a unique_afn shows up in the month more than 1, then "1"
