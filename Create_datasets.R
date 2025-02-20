@@ -51,11 +51,42 @@ monthly_count <- visit %>%
             num_PEOPLE_SERVED = sum(n_household) # number of people that month
             ) 
   
-#This is a test
-#Test 2
-#Test 3
-# Test 4
+#creating monthly frequency variable
 
+monthly_prep <- visit %>% 
+  group_by(round_month,afn)  %>% 
+  summarise(freq=n(),
+            num_PEOPLE_SERVED = sum(n_household), 
+            num_households = length(unique(afn)),
+            
+  )
+
+monthly_frequency <- monthly_prep %>%
+  group_by(round_month) %>% 
+  mutate(FREQ=ifelse(freq > 1,1,0)) %>%  
+  #if a unique_afn shows up in the month more than 1, then "1"
+  summarise(num_VISITS = n(), #num rows (visits)
+            num_PEOPLE_SERVED = sum(num_PEOPLE_SERVED),
+            num_households = length(unique(afn)),
+            more_than_once=sum(FREQ)
+  ) 
+#create day_of_the_week_variable
+
+all$day_of_the_week <- weekdays(all$served_date)
+head(all$day_of_the_week)
+
+# Group by 'day_of_week' and count the number of visits for each day
+week_day_counts <- all %>%
+  group_by(day_of_the_week) %>%
+  tally()
+
+# Print the total count for each weekday
+print(week_day_counts)  
+
+##Saturday and Sunday reflect the least number of visits
+##Monday and Tuesday have the highest number of visits.
+
+##But there's 57 dates that failed to parse when we were cleaning dates
 
 
 
