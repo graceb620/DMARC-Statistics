@@ -42,15 +42,17 @@ monthly_count <- visit %>%
 # AMELIA WORKED FROM HERE ----------------------
 # creating how often a month per household variable
 
-monthly_prep <- visit %>% 
+monthly_household_frequency <- visit %>% 
   group_by(round_month,afn)  %>% 
   summarise(freq=n(),
             num_PEOPLE_SERVED = sum(n_household), 
             num_households = length(unique(afn)),
             
-  )
+  )%>% 
+  mutate(FREQ=ifelse(freq > 1,1,0)) 
+  #this will help us if we want to analyze on a house-level
 
-monthly_frequency <- monthly_prep %>%
+monthly_total_frequency <- monthly_household_frequency %>%
   group_by(round_month) %>% 
   mutate(FREQ=ifelse(freq > 1,1,0)) %>%  
   #if a unique_afn shows up in the month more than 1, then "1"
@@ -80,6 +82,7 @@ sum(zipcode_counts$unique_households < 10)
 zipcode_counts <- filter(zipcode_counts, unique_households > 10)
 
 summary(zipcode_counts) #there are 104 zip codes, including one " "
+#there are some zipcodes that are not real, these are unhoused individuals
 
 hist(zipcode_counts$unique_households) #very right skewed, long right tail
 #most zipcodes are in the 0-1000 range

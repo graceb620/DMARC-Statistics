@@ -157,7 +157,7 @@ print(yearly_counts)
 # 2023 yearly_count matches the count of 1 for first_visit_2023
 
 # Graph the First Visits per household
-ggplot(hh_data_2023, aes(x = first_visit)) +
+ggplot(hh_data, aes(x = first_visit)) +
   geom_density(fill = "blue", alpha = 0.5) +
   labs(title = "Density of First Visits Over Time Per Household",
        x = "First Visit Date",
