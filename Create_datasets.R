@@ -65,7 +65,7 @@ monthly_household_frequency <- visit %>%
   mutate(FREQ=ifelse(freq > 1,1,0)) 
 #this will help us if we want to analyze on a house-level
 
-monthly_total_frequency <- monthly_prep %>%
+monthly_total_frequency <- monthly_household_frequency %>%
   group_by(round_month) %>% 
   mutate(FREQ=ifelse(freq > 1,1,0)) %>%  
   #if a unique_afn shows up in the month more than 1, then "1"
@@ -92,20 +92,64 @@ print(week_day_counts)
 
 ##But there's 57 dates that failed to parse when we were cleaning dates
 
-## Create hh level dataset ---------------
+# HH LEVEL DATASETS INFO ----------
+# WARNING:
+# If you use group_by(afn) and try and get the "count" of x variable in a household
+# You are ONLY getting the count of the people that have gone to pick up the food
+# EVEN if you use unique(), it will only count the people that have gone to pick up the food
+# sometimes, more than one person of the family goes to pick up the food
+# e.g. if only the parent was ever getting the food, you will only get a count of that parent
+# e.g. if sometimes one parent in a family of 4 went, and another time the other parent went,
+# it will seem like there are only 2 people in that family. 
+
+# Additionally, grouping only by afn will combine the count of all the times 
+# that person went to the pantry. 
+# e.g. if you simply use sum(income), 
+# it will calculate income of that person TIMES how often they visited 
+
+# Because of this, I recommend ONLY taking the column that are the same no matter what
+# OR, you need to specifically say that you're making counts about the people that 
+# visited the pantry, not the household as a whole
+
+# the only exception to this is if we focus on single people without children
+# then, using unique() and sum() will be ok
+
+## Create hh level dataset for ALL visits --------------
+
 hh_data <- all %>% 
   group_by(afn) %>% 
   summarize(
-    n_household = n(),
+    #n_household = n(), instead, should be:
+    #n_people_visitng = length(unique(individual_id)), 
+    #n_people_visitng only checks number of people visiting, not number of people in household.
+    #to get actual household, we would need to do the "family_type"
+    #but we don't know how many children they have
+    snap_household=first(snap_household),
+    homeless=first(homeless),
+    family_type=first(family_type),
     first_visit = min(served_date),
-    first_visit_2023 = if_else(year(first_visit) == 2023, 1, 0)
-    ) 
+    last_visit = max(served_date), 
+    first_visit_2018 = if_else(year(first_visit) == 2018, 1, 0),
+    first_visit_2019 = if_else(year(first_visit) == 2019, 1, 0),
+    first_visit_2020 = if_else(year(first_visit) == 2020, 1, 0),
+    first_visit_2021 = if_else(year(first_visit) == 2021, 1, 0),
+    first_visit_2022 = if_else(year(first_visit) == 2022, 1, 0),
+    first_visit_2023 = if_else(year(first_visit) == 2023, 1, 0),
+    first_visit_2024 = if_else(year(first_visit) == 2024, 1, 0),
+  ) 
+
+## Create hh level dataset for all visits in ONLY 2023 ---------------
+hh_data_2023 <- hh_data %>% 
+  filter(year(last_visit) == 2023) #excluding all 2024 data
+  #this will make it so that it only counts those who came in 2023
+  #in 2023, what is the difference between those who came in 
+  #I think that makes more sense than comparing the historic data
 
 # Verify that it only found 2023 first visits
-hh_data %>%
+  hh_data %>%
   count(first_visit_2023, name = "count")
 
-yearly_counts <- hh_data %>%
+yearly_counts <- hh_data_2023 %>%
   mutate(year = year(first_visit)) %>%
   count(year, name = "count")
 
@@ -113,23 +157,9 @@ print(yearly_counts)
 # 2023 yearly_count matches the count of 1 for first_visit_2023
 
 # Graph the First Visits per household
-ggplot(hh_data, aes(x = first_visit)) +
+ggplot(hh_data_2023, aes(x = first_visit)) +
   geom_density(fill = "blue", alpha = 0.5) +
   labs(title = "Density of First Visits Over Time Per Household",
        x = "First Visit Date",
        y = "Density") 
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
 
