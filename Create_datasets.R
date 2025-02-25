@@ -166,21 +166,21 @@ ggplot(hh_data, aes(x = first_visit)) +
        y = "Density") 
 
 ##Graph of Family types and their homeless status
-hh_data %>%
-  count(homeless) %>%
-  ggplot(aes(x = "", y = n, fill = homeless)) +
-  geom_col() +
-  coord_polar(theta = "y") +
-  labs(title = "Proportion of Homeless Households")
 
-#Visit frequency and return patterns
-#visits per household
-ggplot(hh_data, aes(x = "", y = n_people_visiting)) +
-  geom_boxplot(fill = "blue") +
-  labs(title = "Distribution of Number of Visitors Per Household", y = "Number of People Visiting")
+
+hh_data_2023 %>%
+  count(homeless) %>%
+  ggplot(aes(x = homeless, y = n, fill = homeless)) +
+  geom_col() +
+  labs(
+    title = "Count of Homeless vs. Non-Homeless Households in 2023",
+    x = "Homeless Status",
+    y = "Count"
+  )
+
 
 #First visit distribution by Year
-hh_data %>%
+hh_data_2023 %>%
   mutate(first_visit_year = year(first_visit)) %>%
   count(first_visit_year) %>%
   ggplot(aes(x = as.factor(first_visit_year), y = n, fill = as.factor(first_visit_year))) +
@@ -192,10 +192,15 @@ hh_data %>%
 #Proportion of Households recieving SNAP benefits
 hh_data %>%
   count(snap_household) %>%
-  ggplot(aes(x = "", y = n, fill = snap_household)) +
+  ggplot(aes(x = snap_household, y = n, fill = snap_household)) +
   geom_col() +
-  coord_polar(theta = "y") +
-  labs(title = "Proportion of Households Receiving SNAP")
+  labs(
+    title = "Proportion of Households Receiving SNAP",
+    x = "SNAP Household",
+    y = "Count"
+  ) +
+  theme_minimal()
+
 ##Most households dont recieve SNAP benefits.
 
 
