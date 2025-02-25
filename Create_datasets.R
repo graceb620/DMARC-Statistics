@@ -124,7 +124,7 @@ hh_data <- all %>%
     #n_people_visitng only checks number of people visiting, not number of people in household.
     #to get actual household, we would need to do the "family_type"
     #but we don't know how many children they have
-    snap_household=first(snap_household),
+    
     homeless=first(homeless),
     family_type=first(family_type),
     first_visit = min(served_date),
@@ -136,7 +136,34 @@ hh_data <- all %>%
     first_visit_2022 = if_else(year(first_visit) == 2022, 1, 0),
     first_visit_2023 = if_else(year(first_visit) == 2023, 1, 0),
     first_visit_2024 = if_else(year(first_visit) == 2024, 1, 0),
-
+    
+    # Snap related Variables
+    # SNAP Benefits in general
+    snap = first(snap_household), 
+    
+    # SNAP Benefits by year
+    snap_2018 = as.integer(any(year(served_date) == 2018 & snap_household == "Y")), 
+    snap_2019 = as.integer(any(year(served_date) == 2019 & snap_household == "Y")), 
+    snap_2020 = as.integer(any(year(served_date) == 2020 & snap_household == "Y")), 
+    snap_2021 = as.integer(any(year(served_date) == 2021 & snap_household == "Y")), 
+    snap_2022 = as.integer(any(year(served_date) == 2022 & snap_household == "Y")), 
+    snap_2023 = as.integer(any(year(served_date) == 2023 & snap_household == "Y")),  
+    snap_2024 = as.integer(any(year(served_date) == 2024 & snap_household == "Y")),
+    
+    # Receiving SNAP Benefits during first visit
+    snap_first_visit = as.integer(first(snap_household[served_date == first_visit]) == "Y"),
+    
+    # Receiving SNAP Benefits during specific year and first visit
+    snap_first_2018 = as.integer(snap_2018 == 1 & snap_first_visit == 1),
+    snap_first_2019 = as.integer(snap_2019 == 1 & snap_first_visit == 1),
+    snap_first_2020 = as.integer(snap_2020 == 1 & snap_first_visit == 1),
+    snap_first_2021 = as.integer(snap_2021 == 1 & snap_first_visit == 1),
+    snap_first_2022 = as.integer(snap_2022 == 1 & snap_first_visit == 1),
+    snap_first_2023 = as.integer(snap_2023 == 1 & snap_first_visit == 1),
+    snap_first_2024 = as.integer(snap_2024 == 1 & snap_first_visit == 1),
+    
+    # Proportion of time on SNAP
+    snap_proportion = mean(snap_household == "Y", na.rm = TRUE)
   ) 
 
 ## Create hh level dataset for all visits in ONLY 2023 ---------------
