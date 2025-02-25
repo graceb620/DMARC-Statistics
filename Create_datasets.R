@@ -120,7 +120,7 @@ hh_data <- all %>%
   group_by(afn) %>% 
   summarize(
     #n_household = n(), instead, should be:
-    #n_people_visitng = length(unique(individual_id)), 
+    n_people_visitng = length(unique(individual_id)), 
     #n_people_visitng only checks number of people visiting, not number of people in household.
     #to get actual household, we would need to do the "family_type"
     #but we don't know how many children they have
@@ -130,12 +130,13 @@ hh_data <- all %>%
     first_visit = min(served_date),
     last_visit = max(served_date), 
     first_visit_2018 = if_else(year(first_visit) == 2018, 1, 0),
-    first_visit_2019 = if_else(year(first_visit) == 2019, 1, 0),
     first_visit_2020 = if_else(year(first_visit) == 2020, 1, 0),
+    first_visit_2019 = if_else(year(first_visit) == 2019, 1, 0),
     first_visit_2021 = if_else(year(first_visit) == 2021, 1, 0),
     first_visit_2022 = if_else(year(first_visit) == 2022, 1, 0),
     first_visit_2023 = if_else(year(first_visit) == 2023, 1, 0),
     first_visit_2024 = if_else(year(first_visit) == 2024, 1, 0),
+
   ) 
 
 ## Create hh level dataset for all visits in ONLY 2023 ---------------
