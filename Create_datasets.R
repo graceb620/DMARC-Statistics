@@ -241,6 +241,7 @@ summary(hh_data)
 # Explore correlations or cross-tabulations between columns
 # Is there a correlation between family type and housing situation 
 table(hh_data$family_type, hh_data$homeless)
+table(hh_data$family_type, hh_data$homeless)
 
 
 
