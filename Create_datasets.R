@@ -163,6 +163,22 @@ ggplot(hh_data, aes(x = first_visit)) +
        x = "First Visit Date",
        y = "Density") 
 
+##Graph of Family types and their homeless status
+hh_data %>%
+  count(homeless) %>%
+  ggplot(aes(x = "", y = n, fill = homeless)) +
+  geom_col() +
+  coord_polar(theta = "y") +
+  labs(title = "Proportion of Homeless Households")
+
+#Visit frequency and return patterns
+#visits per household
+ggplot(hh_data, aes(x = "", y = n_people_visiting)) +
+  geom_boxplot(fill = "blue") +
+  labs(title = "Distribution of Number of Visitors Per Household", y = "Number of People Visiting")
+
+
+
 # Clean hh_data ----------------------------------------------------------------
 
 # Convert blank strings to NA
