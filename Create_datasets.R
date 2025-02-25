@@ -156,6 +156,8 @@ yearly_counts <- hh_data_2023 %>%
 print(yearly_counts)
 # 2023 yearly_count matches the count of 1 for first_visit_2023
 
+##create visualizations to analyze hh_level dataset ----------------------------
+
 # Graph the First Visits per household
 ggplot(hh_data, aes(x = first_visit)) +
   geom_density(fill = "blue", alpha = 0.5) +
@@ -176,6 +178,25 @@ hh_data %>%
 ggplot(hh_data, aes(x = "", y = n_people_visiting)) +
   geom_boxplot(fill = "blue") +
   labs(title = "Distribution of Number of Visitors Per Household", y = "Number of People Visiting")
+
+#First visit distribution by Year
+hh_data %>%
+  mutate(first_visit_year = year(first_visit)) %>%
+  count(first_visit_year) %>%
+  ggplot(aes(x = as.factor(first_visit_year), y = n, fill = as.factor(first_visit_year))) +
+  geom_col() +
+  labs(title = "Households' First Visit Year", x = "Year", y = "Count") +
+  theme_minimal()
+##More visits in 2018 followed by 2019 and 2023, the least in 2024 and 2021.
+
+#Proportion of Households recieving SNAP benefits
+hh_data %>%
+  count(snap_household) %>%
+  ggplot(aes(x = "", y = n, fill = snap_household)) +
+  geom_col() +
+  coord_polar(theta = "y") +
+  labs(title = "Proportion of Households Receiving SNAP")
+##Most households dont recieve SNAP benefits.
 
 
 
@@ -214,6 +235,7 @@ summary(hh_data)
 
 # Explore correlations or cross-tabulations between columns
 table(hh_data$family_type, hh_data$homeless)
+
 
 
 # Create a small/intro model ---------------------------------------------------
