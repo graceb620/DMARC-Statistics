@@ -163,3 +163,50 @@ ggplot(hh_data, aes(x = first_visit)) +
        x = "First Visit Date",
        y = "Density") 
 
+# Clean hh_data ----------------------------------------------------------------
+
+# Convert blank strings to NA
+hh_data <- hh_data %>% 
+  mutate(across(c(afn, snap_household, homeless, family_type), ~na_if(., "")))
+
+
+# Convert categorical variables to factors
+hh_data <- hh_data %>% 
+  mutate(
+    snap_household = factor(snap_household, levels = c("N", "Y")),
+    homeless = factor(homeless),
+    family_type = factor(family_type)
+  )
+
+# Check for NA values in first_visit and last_visit
+colSums(is.na(hh_data[c("first_visit", "last_visit")]))
+# 0 NA's both in "First_visit" and "last_visit"
+
+# Check whether last_visit is always after or equal to first_visit
+# This will return TRUE if all valid (non-NA) cases satisfy the condition and FALSE otherwise.
+all(hh_data$last_visit >= hh_data$first_visit, na.rm = TRUE)
+# Returned TRUE
+
+# Check for missing household IDs
+sum(is.na(hh_data$afn))
+# 1 missing value 
+hh_data[is.na(hh_data$afn), ]
+# Looks like an error ?
+
+# Check summary after cleaning
+summary(hh_data)
+
+# Explore correlations or cross-tabulations between columns
+table(hh_data$family_type, hh_data$homeless)
+
+
+# Create a small/intro model ---------------------------------------------------
+
+
+
+
+
+
+
+
+
