@@ -19,7 +19,7 @@ library(tidyverse)
 library(dplyr)
 
 # Create the main dataset from raw csv -----------------------------------------
-all <- read.csv("Data/drake_export_v8_2024-02-13_100754_rev2_nolatlong.csv")
+all <- read.csv("")
 
 # Cleaning of dates ------------------------------------------------------------
 all <- all %>% 
@@ -163,8 +163,38 @@ hh_data <- all %>%
     snap_first_2024 = as.integer(snap_2024 == 1 & snap_first_visit == 1),
     
     # Proportion of time on SNAP
-    snap_proportion = mean(snap_household == "Y", na.rm = TRUE)
-  ) 
+    snap_proportion = mean(snap_household == "Y", na.rm = TRUE),
+    
+    # First recorded household income  
+    income_first = first(annual_income),  
+    
+    # Most recent household income  
+    income_latest = last(annual_income),  
+    
+    # Household income by year  
+    income_2018 = first(annual_income[year(served_date) == 2018], na.rm = TRUE),  
+    income_2019 = first(annual_income[year(served_date) == 2019], na.rm = TRUE),  
+    income_2020 = first(annual_income[year(served_date) == 2020], na.rm = TRUE),
+    income_2021 = first(annual_income[year(served_date) == 2021], na.rm = TRUE),  
+    income_2022 = first(annual_income[year(served_date) == 2022], na.rm = TRUE), 
+    income_2023 = first(annual_income[year(served_date) == 2023], na.rm = TRUE),  
+    income_2024 = first(annual_income[year(served_date) == 2024], na.rm = TRUE), 
+    
+    # Household income at first visit  
+    income_first_visit = first(annual_income[served_date == first_visit]),  
+    
+    # Average household income across visits  
+    income_avg = mean(annual_income, na.rm = TRUE),  
+    
+    # Median household income across visits  
+    income_median = median(annual_income, na.rm = TRUE),  
+    
+    # Maximum and minimum recorded household income  
+    income_max = max(annual_income, na.rm = TRUE),  
+    income_min = min(annual_income, na.rm = TRUE)  
+  )
+summary(hh_data)
+  
 
 ## Create hh level dataset for all visits in ONLY 2023 ---------------
 hh_data_2023 <- hh_data %>% 
