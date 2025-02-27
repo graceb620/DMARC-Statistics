@@ -19,13 +19,14 @@ library(tidyverse)
 library(dplyr)
 
 # Create the main dataset from raw csv -----------------------------------------
-all <- read.csv("")
+all <- read.csv("/Users/ameliaburnell/Documents/GitHub/DMARC-Statistics/Data/drake_export_v8_2024-02-13_100754_rev2_nolatlong.csv")
 
 # Cleaning of dates ------------------------------------------------------------
 all <- all %>% 
   mutate(
     served_date=ymd(served_date),
-    dob=ymd(dob)
+    dob=ymd(dob),
+    age=year(Sys.Date())-year(dob)
   )
 # 57 failed to parse - will have to deal with these on a case by case basis
 
@@ -119,9 +120,9 @@ print(week_day_counts)
 hh_data <- all %>% 
   group_by(afn) %>% 
   summarize(
-    n_people_in_household = length(unique(individual_id)), 
-    homeless=first(homeless),
-    family_type=first(family_type),
+    
+    n_people_in_household = length(unique(individual_id)),
+    
     first_visit = min(served_date),
     last_visit = max(served_date), 
     first_visit_2018 = if_else(year(first_visit) == 2018, 1, 0),
@@ -167,16 +168,17 @@ hh_data <- all %>%
     income_latest = last(annual_income),  
     
     # Household income by year  
-    income_2018 = first(annual_income[year(served_date) == 2018], na.rm = TRUE),  
-    income_2019 = first(annual_income[year(served_date) == 2019], na.rm = TRUE),  
-    income_2020 = first(annual_income[year(served_date) == 2020], na.rm = TRUE),
-    income_2021 = first(annual_income[year(served_date) == 2021], na.rm = TRUE),  
-    income_2022 = first(annual_income[year(served_date) == 2022], na.rm = TRUE), 
-    income_2023 = first(annual_income[year(served_date) == 2023], na.rm = TRUE),  
-    income_2024 = first(annual_income[year(served_date) == 2024], na.rm = TRUE), 
+    # income_2018 = first(annual_income[year(served_date) == 2018], na.rm = TRUE),  
+    # income_2019 = first(annual_income[year(served_date) == 2019], na.rm = TRUE),  
+    # income_2020 = first(annual_income[year(served_date) == 2020], na.rm = TRUE),
+    # income_2021 = first(annual_income[year(served_date) == 2021], na.rm = TRUE),  
+    # income_2022 = first(annual_income[year(served_date) == 2022], na.rm = TRUE), 
+    # income_2023 = first(annual_income[year(served_date) == 2023], na.rm = TRUE),  
+    # income_2024 = first(annual_income[year(served_date) == 2024], na.rm = TRUE), 
+    # This was making some error for me, so I commented it out for now - Amelia
     
     # Household income at first visit  
-    income_first_visit = first(annual_income[served_date == first_visit]),  
+    income_first_visit = first(annual_income[served_date == first_visit]),
     
     # Average household income across visits  
     income_avg = mean(annual_income, na.rm = TRUE),  
@@ -186,8 +188,33 @@ hh_data <- all %>%
     
     # Maximum and minimum recorded household income  
     income_max = max(annual_income, na.rm = TRUE),  
-    income_min = min(annual_income, na.rm = TRUE)  
+    income_min = min(annual_income, na.rm = TRUE),
+    
+    #housing information - homeless
+    last_homeless_state=first(homeless[served_date == last_visit]), na.rm = TRUE,
+    first_homeless_state=first(homeless[served_date == first_visit]), na.rm = TRUE,
+    one_change_homeless_state=ifelse(length(unique(homeless))==1,1,0), 
+    more_than_one_change_homeless_state=ifelse(length(unique(homeless))>1,1,0),
+    
+    #housing information - housing_type
+    last_housing_type=first(housing_type[served_date == last_visit]), na.rm = TRUE,
+    first_housing_type=first(housing_type[served_date == first_visit]), na.rm = TRUE,
+    one_change_housing_type=ifelse(length(unique(housing_type))==1,1,0), 
+    more_than_one_change_housing_type=ifelse(length(unique(housing_type))>1,1,0),
+    
+    #housing information - whether they own a house
+    own_or_buying=ifelse(first(housing[served_date == last_visit])=="Own/Buying",1,0),
+    
+    #location information - changes
+    one_change_location=ifelse(length(unique(location))==1,1,0), 
+    more_than_one_change_location=ifelse(unique(location)>1,1,0),
+    
+    #demographic - age
+    elderly=ifelse(any(age>64),1,0),
+    child=ifelse(any(age<18),1,0),
+    working_age=ifelse(any(age>18&age<64),1,0),
   )
+
 summary(hh_data)
   
 # Clean hh_data ----------------------------------------------------------------
@@ -297,10 +324,6 @@ hh_data %>%
 
 
 # Create a small/intro model ---------------------------------------------------
-
-
-
-
 
 
 
