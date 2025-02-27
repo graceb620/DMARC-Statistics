@@ -159,6 +159,15 @@ hh_data <- all %>%
     snap_first_2023 = as.integer(snap_2023 == 1 & snap_first_visit == 1),
     snap_first_2024 = as.integer(snap_2024 == 1 & snap_first_visit == 1),
     
+    # If they came off of SNAP at any point during a given year
+    snap_change_2018 = as.integer(year(served_date)==2018 & length(unique(snap_household)>1)), na.rm = TRUE,
+    snap_change_2019 = as.integer(year(served_date)==2019 & length(unique(snap_household)>1)), na.rm = TRUE,
+    snap_change_2020 = as.integer(year(served_date)==2020 & length(unique(snap_household)>1)), na.rm = TRUE,
+    snap_change_2021 = as.integer(year(served_date)==2021 & length(unique(snap_household)>1)), na.rm = TRUE,
+    snap_change_2022 = as.integer(year(served_date)==2022 & length(unique(snap_household)>1)), na.rm = TRUE,
+    snap_change_2023 = as.integer(year(served_date)==2023 & length(unique(snap_household)>1)), na.rm = TRUE,
+    snap_change_2024 = as.integer(year(served_date)==2024 & length(unique(snap_household)>1)), na.rm = TRUE,
+    
     # Proportion of time on SNAP
     snap_proportion = mean(snap_household == "Y", na.rm = TRUE),
     
