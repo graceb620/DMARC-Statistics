@@ -19,7 +19,7 @@ library(tidyverse)
 library(dplyr)
 
 # Create the main dataset from raw csv -----------------------------------------
-all <- read.csv("Data/drake_export_v8_2024-02-13_100754_rev2_nolatlong.csv")
+all <- read.csv("C:/Users/lynne/OneDrive/Desktop/casestudy/drake_export_v8_2024-02-13_100754_rev2_nolatlong.csv")
 
 # Cleaning of dates ------------------------------------------------------------
 all <- all %>% 
@@ -166,17 +166,26 @@ hh_data <- all %>%
     income_first = first(annual_income),  
     
     # Most recent household income  
-    income_latest = last(annual_income),  
+    income_latest = last(annual_income), 
     
-    # Household income by year  
-    # income_2018 = first(annual_income[year(served_date) == 2018], na.rm = TRUE),  
-    # income_2019 = first(annual_income[year(served_date) == 2019], na.rm = TRUE),  
-    # income_2020 = first(annual_income[year(served_date) == 2020], na.rm = TRUE),
-    # income_2021 = first(annual_income[year(served_date) == 2021], na.rm = TRUE),  
-    # income_2022 = first(annual_income[year(served_date) == 2022], na.rm = TRUE), 
-    # income_2023 = first(annual_income[year(served_date) == 2023], na.rm = TRUE),  
-    # income_2024 = first(annual_income[year(served_date) == 2024], na.rm = TRUE), 
-    # This was making some error for me, so I commented it out for now - Amelia
+    # Compute household-specific median income, ignoring negative values and NA
+    household_income_median = median(annual_income[annual_income >= 0], na.rm = TRUE),
+    
+    # Replace NA and negative values with the household median
+    #annual_income = ifelse(is.na(annual_income) | annual_income < 0, household_income_median, annual_income)
+  #) %>%
+  #summarise(
+    #n_people_in_household = length(unique(individual_id)),
+    
+     #Household income by year  
+     income_2018 = first(annual_income[year(served_date) == 2018]),  
+     income_2019 = first(annual_income[year(served_date) == 2019]),  
+     income_2020 = first(annual_income[year(served_date) == 2020]),
+     income_2021 = first(annual_income[year(served_date) == 2021]),  
+     income_2022 = first(annual_income[year(served_date) == 2022]), 
+     income_2023 = first(annual_income[year(served_date) == 2023]),  
+     income_2024 = first(annual_income[year(served_date) == 2024]), 
+     #This was making some error for me, so I commented it out for now - Amelia
     
     # Household income at first visit  
     income_first_visit = first(annual_income[served_date == first_visit]),
