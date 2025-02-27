@@ -19,7 +19,7 @@ library(tidyverse)
 library(dplyr)
 
 # Create the main dataset from raw csv -----------------------------------------
-all <- read.csv("C:/Users/lynne/OneDrive/Desktop/casestudy/drake_export_v8_2024-02-13_100754_rev2_nolatlong.csv")
+all <- read.csv("Data/drake_export_v8_2024-02-13_100754_rev2_nolatlong.csv")
 
 # Cleaning of dates ------------------------------------------------------------
 all <- all %>% 
