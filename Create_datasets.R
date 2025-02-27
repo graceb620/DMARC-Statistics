@@ -216,18 +216,20 @@ hh_data <- all %>%
     working_age=ifelse(any(age>18&age<64),1,0),
     
     # Determine whether there is a person with a college degree in the household
-    college_education = if_else(education == 'College 2 or 4 yr Degree' | education == 'College Advanced Degree', 1, 0),
+    college_education = if_else(any(education == 'College 2 or 4 yr Degree' | education == 'College Advanced Degree'), 1, 0),
     
-    # Determine whether the highest level of education in the household
-    highest_education = if_else(education == 'College 2 or 4 yr Degree' | education == 'College Advanced Degree', "Higher Education",
-      if_else(education == 'HS Grad / Some College' | education == 'HS Grad', "High School","Unknown / Does not apply")),
+    # Determine the highest level of education in the household
+    highest_education = case_when(
+      any(education == 'College 2 or 4 yr Degree' | education == 'College Advanced Degree') ~ "Higher Education",
+      any(education == 'HS Grad / Some College' | education == 'HS Grad') ~ "High School",
+      TRUE ~ "Unknown / Does not apply"
+    ),
     
     # Determine whether there are kids in the household
-    kids <- if_else(family_type == "Adults with Children" | family_type == "Male Adult with Children" | family_type == "Female Adult with Children", 1, 0),
+    kids = if_else(any(family_type == "Adults with Children" | family_type == "Male Adult with Children" | family_type == "Female Adult with Children"), 1, 0),
     
-    # Determine whether it's a single-parent situation
-    single_parent = if_else(family_type == "Male Adult with Children" | family_type == "Female Adult with Children", "Yes", "No / Does not apply")
-    
+    # Determine whether it's a single-parent household
+    single_parent = if_else(any(family_type == "Male Adult with Children" | family_type == "Female Adult with Children"), "Yes", "No / Does not apply")
     
   )
 
