@@ -19,7 +19,7 @@ library(tidyverse)
 library(dplyr)
 
 # Create the main dataset from raw csv -----------------------------------------
-all <- read.csv("/Users/ameliaburnell/Documents/GitHub/DMARC-Statistics/Data/drake_export_v8_2024-02-13_100754_rev2_nolatlong.csv")
+all <- read.csv("Data/drake_export_v8_2024-02-13_100754_rev2_nolatlong.csv")
 
 # Cleaning of dates ------------------------------------------------------------
 all <- all %>% 
@@ -87,6 +87,7 @@ week_day_counts <- all %>%
 
 # Print the total count for each weekday
 print(week_day_counts)  
+
 
 ##Saturday and Sunday reflect the least number of visits
 ##Monday and Tuesday have the highest number of visits.
@@ -213,6 +214,17 @@ hh_data <- all %>%
     elderly=ifelse(any(age>64),1,0),
     child=ifelse(any(age<18),1,0),
     working_age=ifelse(any(age>18&age<64),1,0),
+    
+    # Determine whether there is a person with a college degree in the household
+    college_education = if_else(education == "College 2 or 4 yr Degree" | education == "College Advanced Degree", "Yes", "No")
+    
+    # Determine whether there are kids in the household
+    kids <- if_else(family_type == "Adults with Children" | family_type == "Male Adult with Children" | family_type == "Female Adult with Children", "Yes", "No")
+    
+    # Determine whether it's a single-parent situation
+    single_parent = if_else(kids == "Yes" & (family_type == "Male Adult with Children" | family_type == "Female Adult with Children"), "Yes", "No / Does not apply")
+    
+    
   )
 
 summary(hh_data)
