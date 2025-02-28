@@ -177,13 +177,20 @@ hh_data <- all %>%
     # Proportion of time on SNAP
     snap_proportion = mean(snap_household == "Y", na.rm = TRUE),
     # Proportion of time on SNAP/Year
-    snap_proportion_2018 = mean(snap_household[year(served_date) == 2018] == "Y", na.rm = TRUE),
-    snap_proportion_2019 = mean(snap_household[year(served_date) == 2019] == "Y", na.rm = TRUE),
-    snap_proportion_2020 = mean(snap_household[year(served_date) == 2020] == "Y", na.rm = TRUE),
-    snap_proportion_2021 = mean(snap_household[year(served_date) == 2021] == "Y", na.rm = TRUE),
-    snap_proportion_2022 = mean(snap_household[year(served_date) == 2022] == "Y", na.rm = TRUE),
-    snap_proportion_2023 = mean(snap_household[year(served_date) == 2023] == "Y", na.rm = TRUE),
-    snap_proportion_2024 = mean(snap_household[year(served_date) == 2024] == "Y", na.rm = TRUE),
+    snap_proportion_2018 = ifelse(any(year(served_date) == 2018), 
+                                  mean(snap_household[year(served_date) == 2018] == "Y", na.rm = TRUE), 0),
+    snap_proportion_2019 = ifelse(any(year(served_date) == 2019), 
+                                  mean(snap_household[year(served_date) == 2019] == "Y", na.rm = TRUE), 0),
+    snap_proportion_2020 = ifelse(any(year(served_date) == 2020), 
+                                  mean(snap_household[year(served_date) == 2020] == "Y", na.rm = TRUE), 0),
+    snap_proportion_2021 = ifelse(any(year(served_date) == 2021), 
+                                  mean(snap_household[year(served_date) == 2021] == "Y", na.rm = TRUE), 0),
+    snap_proportion_2022 = ifelse(any(year(served_date) == 2022), 
+                                  mean(snap_household[year(served_date) == 2022] == "Y", na.rm = TRUE), 0),
+    snap_proportion_2023 = ifelse(any(year(served_date) == 2023), 
+                                  mean(snap_household[year(served_date) == 2023] == "Y", na.rm = TRUE), 0),
+    snap_proportion_2024 = ifelse(any(year(served_date) == 2024), 
+                                  mean(snap_household[year(served_date) == 2024] == "Y", na.rm = TRUE), 0),
     
     # First recorded household income
     income_first = first(na.omit(annual_income)),   
@@ -304,49 +311,72 @@ summary(hh_data)
   
 # Clean hh_data ----------------------------------------------------------------
 
-# Convert blank strings to NA
-hh_data <- hh_data %>% 
-  mutate(across(c(afn, snap_household, homeless, family_type), ~na_if(., "")))
+# # Convert blank strings to NA
+# hh_data <- hh_data %>% 
+#   mutate(across(c(afn, snap_household, homeless, family_type), ~na_if(., "")))
+# 
+# 
+# # Convert categorical variables to factors
+# hh_data <- hh_data %>% 
+#   mutate(
+#     snap_household = factor(snap_household, levels = c("N", "Y")),
+#     homeless = factor(homeless),
+#     family_type = factor(family_type)
+#   )
+# 
+# # Check for NA values in first_visit and last_visit
+# colSums(is.na(hh_data[c("first_visit", "last_visit")]))
+# # 0 NA's both in "First_visit" and "last_visit"
+# 
+# # Check whether last_visit is always after or equal to first_visit
+# # This will return TRUE if all valid (non-NA) cases satisfy the condition and FALSE otherwise.
+# all(hh_data$last_visit >= hh_data$first_visit, na.rm = TRUE)
+# # Returned TRUE
+# 
+# # Check for missing household IDs
+# sum(is.na(hh_data$afn))
+# # 1 missing value 
+# hh_data[is.na(hh_data$afn), ]
+# # Looks like an error ?
+# 
+# # Check summary after cleaning
+# summary(hh_data)
+# 
+# # Explore correlations or cross-tabulations between columns
+# # Is there a correlation between family type and housing situation
+# table(hh_data$family_type, hh_data$homeless)
+# table(hh_data$family_type, hh_data$homeless)
+# COMMENTING IT OUT FOR NOW FOR RUNNING DOCUMENT PURPOSES. CHANGE LATER
+#   - FROM: Grace
 
-
-# Convert categorical variables to factors
-hh_data <- hh_data %>% 
-  mutate(
-    snap_household = factor(snap_household, levels = c("N", "Y")),
-    homeless = factor(homeless),
-    family_type = factor(family_type)
-  )
-
-# Check for NA values in first_visit and last_visit
-colSums(is.na(hh_data[c("first_visit", "last_visit")]))
-# 0 NA's both in "First_visit" and "last_visit"
-
-# Check whether last_visit is always after or equal to first_visit
-# This will return TRUE if all valid (non-NA) cases satisfy the condition and FALSE otherwise.
-all(hh_data$last_visit >= hh_data$first_visit, na.rm = TRUE)
-# Returned TRUE
-
-# Check for missing household IDs
-sum(is.na(hh_data$afn))
-# 1 missing value 
-hh_data[is.na(hh_data$afn), ]
-# Looks like an error ?
-
-# Check summary after cleaning
-summary(hh_data)
-
-# Explore correlations or cross-tabulations between columns
-# Is there a correlation between family type and housing situation
-table(hh_data$family_type, hh_data$homeless)
-table(hh_data$family_type, hh_data$homeless)
-
+### Cleaning Removal of NA values
+# There are many NA values in these columns. This could be due to there being
+# no visits during those years. replacing with median of the value
+hh_data <- hh_data %>%
+  mutate(across(starts_with("income_"), ~ coalesce(., household_income_median)),
+         across(starts_with("fed_poverty_level_20"), ~ coalesce(., fed_poverty_level_median)))
 
 ## Create hh level dataset for all visits in ONLY 2023 ---------------
-hh_data_2023 <- hh_data %>% 
+hh_data_2023 <- hh_data %>%
   filter(year(last_visit) == 2023) #excluding all 2024 data
-  #this will make it so that it only counts those who came in 2023
-  #in 2023, what is the difference between those who came in 
-  #I think that makes more sense than comparing the historic data
+
+# Create a hh level dataset for all people who's first visit was 2023 ---------
+hh_first_visit_2023 <- hh_data %>%
+  filter(year(first_visit) == 2023) %>%
+  select(afn, n_people_in_household, first_visit, last_visit,
+         snap, snap_first_visit, snap_first_2023,
+         snap_change_2023, snap_proportion_2023,
+         income_first, income_last, income_2023, income_avg, 
+         income_max, income_min, household_income_median,
+         fed_poverty_level_first, fed_poverty_level_2023,
+         fed_poverty_level_first_visit, fed_poverty_level_avg, 
+         fed_poverty_level_max, fed_poverty_level_min, 
+         first_homeless_state, last_homeless_state, 
+         first_housing_type, last_housing_type, own_or_buying,
+         one_change_location, more_than_one_change_location,
+         elderly, child, working_age, college_education, 
+         highest_education, kids, single_parent)
+
 
 # Verify that it only found 2023 first visits
   hh_data %>%
