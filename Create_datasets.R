@@ -122,7 +122,7 @@ hh_data <- all %>%
   group_by(afn) %>% 
   summarize(
     
-    n_people_in_household = length(unique(individual_id)),
+    n_people_in_household = n_distinct(individual_id),
     
     first_visit = min(served_date),
     last_visit = max(served_date), 
@@ -136,7 +136,7 @@ hh_data <- all %>%
     
     # Snap related Variables
     # SNAP Benefits in general
-    snap = first(snap_household), 
+    snap = as.integer(any(snap_household == "Y", na.rm = TRUE)),
     
     # SNAP Benefits by year
     snap_2018 = as.integer(any(year(served_date) == 2018 & snap_household == "Y")), 
@@ -149,33 +149,47 @@ hh_data <- all %>%
     
     # Receiving SNAP Benefits during first visit
     snap_first_visit = as.integer(first(snap_household[served_date == first_visit]) == "Y"),
-    
     # Receiving SNAP Benefits during specific year and first visit
-    snap_first_2018 = as.integer(snap_2018 == 1 & snap_first_visit == 1),
-    snap_first_2019 = as.integer(snap_2019 == 1 & snap_first_visit == 1),
-    snap_first_2020 = as.integer(snap_2020 == 1 & snap_first_visit == 1),
-    snap_first_2021 = as.integer(snap_2021 == 1 & snap_first_visit == 1),
-    snap_first_2022 = as.integer(snap_2022 == 1 & snap_first_visit == 1),
-    snap_first_2023 = as.integer(snap_2023 == 1 & snap_first_visit == 1),
-    snap_first_2024 = as.integer(snap_2024 == 1 & snap_first_visit == 1),
+    snap_first_2018 = as.integer(first_visit_2018 == 1 & snap_first_visit == 1),
+    snap_first_2019 = as.integer(first_visit_2019 == 1 & snap_first_visit == 1),
+    snap_first_2020 = as.integer(first_visit_2020 == 1 & snap_first_visit == 1),
+    snap_first_2021 = as.integer(first_visit_2021 == 1 & snap_first_visit == 1),
+    snap_first_2022 = as.integer(first_visit_2022 == 1 & snap_first_visit == 1),
+    snap_first_2023 = as.integer(first_visit_2023 == 1 & snap_first_visit == 1),
+    snap_first_2024 = as.integer(first_visit_2024 == 1 & snap_first_visit == 1),
     
     # If they came off of SNAP at any point during a given year
-    snap_change_2018 = as.integer(year(served_date)==2018 & length(unique(snap_household)>1)), na.rm = TRUE,
-    snap_change_2019 = as.integer(year(served_date)==2019 & length(unique(snap_household)>1)), na.rm = TRUE,
-    snap_change_2020 = as.integer(year(served_date)==2020 & length(unique(snap_household)>1)), na.rm = TRUE,
-    snap_change_2021 = as.integer(year(served_date)==2021 & length(unique(snap_household)>1)), na.rm = TRUE,
-    snap_change_2022 = as.integer(year(served_date)==2022 & length(unique(snap_household)>1)), na.rm = TRUE,
-    snap_change_2023 = as.integer(year(served_date)==2023 & length(unique(snap_household)>1)), na.rm = TRUE,
-    snap_change_2024 = as.integer(year(served_date)==2024 & length(unique(snap_household)>1)), na.rm = TRUE,
+    # snap_change_2018 = as.integer(year(served_date)==2018 & length(unique(snap_household)>1)), na.rm = TRUE,
+    # snap_change_2019 = as.integer(year(served_date)==2019 & length(unique(snap_household)>1)), na.rm = TRUE,
+    # snap_change_2020 = as.integer(year(served_date)==2020 & length(unique(snap_household)>1)), na.rm = TRUE,
+    # snap_change_2021 = as.integer(year(served_date)==2021 & length(unique(snap_household)>1)), na.rm = TRUE,
+    # snap_change_2022 = as.integer(year(served_date)==2022 & length(unique(snap_household)>1)), na.rm = TRUE,
+    # snap_change_2023 = as.integer(year(served_date)==2023 & length(unique(snap_household)>1)), na.rm = TRUE,
+    # snap_change_2024 = as.integer(year(served_date)==2024 & length(unique(snap_household)>1)), na.rm = TRUE,
+    snap_change_2018 = as.integer(n_distinct(snap_household[year(served_date) == 2018]) > 1),
+    snap_change_2019 = as.integer(n_distinct(snap_household[year(served_date) == 2019]) > 1),
+    snap_change_2020 = as.integer(n_distinct(snap_household[year(served_date) == 2020]) > 1),
+    snap_change_2021 = as.integer(n_distinct(snap_household[year(served_date) == 2021]) > 1),
+    snap_change_2022 = as.integer(n_distinct(snap_household[year(served_date) == 2022]) > 1),
+    snap_change_2023 = as.integer(n_distinct(snap_household[year(served_date) == 2023]) > 1),
+    snap_change_2024 = as.integer(n_distinct(snap_household[year(served_date) == 2024]) > 1),
     
     # Proportion of time on SNAP
     snap_proportion = mean(snap_household == "Y", na.rm = TRUE),
+    # Proportion of time on SNAP/Year
+    snap_proportion_2018 = mean(snap_household[year(served_date) == 2018] == "Y", na.rm = TRUE),
+    snap_proportion_2019 = mean(snap_household[year(served_date) == 2019] == "Y", na.rm = TRUE),
+    snap_proportion_2020 = mean(snap_household[year(served_date) == 2020] == "Y", na.rm = TRUE),
+    snap_proportion_2021 = mean(snap_household[year(served_date) == 2021] == "Y", na.rm = TRUE),
+    snap_proportion_2022 = mean(snap_household[year(served_date) == 2022] == "Y", na.rm = TRUE),
+    snap_proportion_2023 = mean(snap_household[year(served_date) == 2023] == "Y", na.rm = TRUE),
+    snap_proportion_2024 = mean(snap_household[year(served_date) == 2024] == "Y", na.rm = TRUE),
     
-    # First recorded household income  
-    income_first = first(annual_income),  
+    # First recorded household income
+    income_first = first(na.omit(annual_income)),   
     
     # Most recent household income  
-    income_latest = last(annual_income), 
+    income_last = last(na.omit(annual_income)), 
     
     # Compute household-specific median income, ignoring negative values and NA
     household_income_median = median(annual_income[annual_income >= 0], na.rm = TRUE),
@@ -196,37 +210,72 @@ hh_data <- all %>%
      income_2024 = first(annual_income[year(served_date) == 2024]), 
      #This was making some error for me, so I commented it out for now - Amelia
     
-    # Household income at first visit  
-    income_first_visit = first(annual_income[served_date == first_visit]),
+    # Household income at first visit | Commented out because of redundancy | Same as income_first | From Grace 
+    # income_first_visit = first(annual_income[served_date == first_visit]),
     
     # Average household income across visits  
     income_avg = mean(annual_income, na.rm = TRUE),  
     
     # Median household income across visits  
-    income_median = median(annual_income, na.rm = TRUE),  
+    # income_median = median(annual_income, na.rm = TRUE),  
     
     # Maximum and minimum recorded household income  
     income_max = max(annual_income, na.rm = TRUE),  
     income_min = min(annual_income, na.rm = TRUE),
     
+    # fed_poverty_level related variables
+    # First recorded fed poverty level
+    fed_poverty_level_first = first(na.omit(fed_poverty_level)),  
+    
+    # Most recent fed_poverty_level  
+    recent_fed_poverty_level = last(na.omit(fed_poverty_level)),
+    
+    #fed_poverty_level by year  
+    fed_poverty_level_2018 = first(fed_poverty_level[year(served_date) == 2018]),  
+    fed_poverty_level_2019 = first(fed_poverty_level[year(served_date) == 2019]),  
+    fed_poverty_level_2020 = first(fed_poverty_level[year(served_date) == 2020]),
+    fed_poverty_level_2021 = first(fed_poverty_level[year(served_date) == 2021]),  
+    fed_poverty_level_2022 = first(fed_poverty_level[year(served_date) == 2022]), 
+    fed_poverty_level_2023 = first(fed_poverty_level[year(served_date) == 2023]),  
+    fed_poverty_level_2024 = first(fed_poverty_level[year(served_date) == 2024]), 
+    
+    # Household income at first visit  
+    fed_poverty_level_first_visit = first(fed_poverty_level[served_date == first_visit]),
+    
+    # Average household income across visits  
+    fed_poverty_level_avg = mean(fed_poverty_level, na.rm = TRUE),  
+    
+    # Median household income across visits  
+    fed_poverty_level_median = median(annual_income, na.rm = TRUE),  
+    
+    # Maximum and minimum recorded household income  
+    fed_poverty_level_max = max(fed_poverty_level, na.rm = TRUE),  
+    fed_poverty_level_min = min(fed_poverty_level, na.rm = TRUE),
+  
     #housing information - homeless
     last_homeless_state=first(homeless[served_date == last_visit]), na.rm = TRUE,
     first_homeless_state=first(homeless[served_date == first_visit]), na.rm = TRUE,
-    one_change_homeless_state=ifelse(length(unique(homeless))==1,1,0), 
-    more_than_one_change_homeless_state=ifelse(length(unique(homeless))>1,1,0),
+    # one_change_homeless_state=ifelse(length(unique(homeless))==1,1,0), 
+    one_change_homeless_state = as.integer(n_distinct(homeless) == 1),
+    # more_than_one_change_homeless_state=ifelse(length(unique(homeless))>1,1,0),
+    more_than_one_change_homeless_state = as.integer(n_distinct(homeless) > 1),
     
     #housing information - housing_type
     last_housing_type=first(housing_type[served_date == last_visit]), na.rm = TRUE,
     first_housing_type=first(housing_type[served_date == first_visit]), na.rm = TRUE,
-    one_change_housing_type=ifelse(length(unique(housing_type))==1,1,0), 
-    more_than_one_change_housing_type=ifelse(length(unique(housing_type))>1,1,0),
+    # one_change_housing_type=ifelse(length(unique(housing_type))==1,1,0), 
+    one_change_housing_type = as.integer(n_distinct(housing_type) == 1),
+    # more_than_one_change_housing_type=ifelse(length(unique(housing_type))>1,1,0),
+    more_than_one_change_housing_type = as.integer(n_distinct(housing_type) > 1),
     
     #housing information - whether they own a house
     own_or_buying=ifelse(first(housing[served_date == last_visit])=="Own/Buying",1,0),
     
     #location information - changes
-    one_change_location=ifelse(length(unique(location))==1,1,0), 
-    more_than_one_change_location=ifelse(unique(location)>1,1,0),
+    # one_change_location=ifelse(length(unique(location))==1,1,0), 
+    # more_than_one_change_location=ifelse(length(unique(location))>1,1,0),
+    one_change_location = as.integer(n_distinct(location) == 1), 
+    more_than_one_change_location = as.integer(n_distinct(location) > 1),
     
     #demographic - age
     elderly=ifelse(any(age>64),1,0),
