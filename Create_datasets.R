@@ -356,10 +356,6 @@ hh_data <- hh_data %>%
   mutate(across(starts_with("income_"), ~ coalesce(., household_income_median)),
          across(starts_with("fed_poverty_level_20"), ~ coalesce(., fed_poverty_level_median)))
 
-## Create hh level dataset for all visits in ONLY 2023 ---------------
-hh_data_2023 <- hh_data %>%
-  filter(year(last_visit) == 2023) #excluding all 2024 data
-
 # Create a hh level dataset for all people who's first visit was 2023 ---------
 hh_first_visit_2023 <- hh_data %>%
   filter(year(first_visit) == 2023) %>%
@@ -377,70 +373,34 @@ hh_first_visit_2023 <- hh_data %>%
          elderly, child, working_age, college_education, 
          highest_education, kids, single_parent)
 
+# Create a hh level dataset for all people who visited in 2023 ---------
+hh_23 <- hh_data %>%
+  filter(year(last_visit) == 2023) %>%
+  select(afn, n_people_in_household, first_visit, last_visit,
+         snap, snap_first_visit, snap_first_2023,
+         snap_change_2023, snap_proportion_2023,
+         income_first, income_last, income_2023, income_avg, 
+         income_max, income_min, household_income_median,
+         fed_poverty_level_first, fed_poverty_level_2023,
+         fed_poverty_level_first_visit, fed_poverty_level_avg, 
+         fed_poverty_level_max, fed_poverty_level_min, 
+         first_homeless_state, last_homeless_state, 
+         first_housing_type, last_housing_type, own_or_buying,
+         one_change_location, more_than_one_change_location,
+         elderly, child, working_age, college_education, 
+         highest_education, kids, single_parent)
+
+write.csv(hh_data,"Data/hh_data.csv", row.names = FALSE)
+write.csv(hh_first_visit_2023,"Data/hh_first23.csv", row.names = FALSE)
+write.csv(hh_23,"Data/hh_data23.csv", row.names = FALSE)
 
 # Verify that it only found 2023 first visits
-  hh_data %>%
-  count(first_visit_2023, name = "count")
+#hh_data %>%
+#  count(first_visit_2023, name = "count")
 
-yearly_counts <- hh_data_2023 %>%
-  mutate(year = year(first_visit)) %>%
-  count(year, name = "count")
+#yearly_counts <- hh_data_2023 %>%
+#  mutate(year = year(first_visit)) %>%
+#  count(year, name = "count")
 
-print(yearly_counts)
+#print(yearly_counts)
 # 2023 yearly_count matches the count of 1 for first_visit_2023
-
-##create visualizations to analyze hh_level dataset ----------------------------
-
-# Graph the First Visits per household
-ggplot(hh_data, aes(x = first_visit)) +
-  geom_density(fill = "blue", alpha = 0.5) +
-  labs(title = "Density of First Visits Over Time Per Household",
-       x = "First Visit Date",
-       y = "Density") 
-
-##Graph of Family types and their homeless status
-
-
-hh_data_2023 %>%
-  count(homeless) %>%
-  ggplot(aes(x = homeless, y = n, fill = homeless)) +
-  geom_col() +
-  labs(
-    title = "Count of Homeless vs. Non-Homeless Households in 2023",
-    x = "Homeless Status",
-    y = "Count"
-  )
-
-
-#First visit distribution by Year
-hh_data_2023 %>%
-  mutate(first_visit_year = year(first_visit)) %>%
-  count(first_visit_year) %>%
-  ggplot(aes(x = as.factor(first_visit_year), y = n, fill = as.factor(first_visit_year))) +
-  geom_col() +
-  labs(title = "Households' First Visit Year", x = "Year", y = "Count") +
-  theme_minimal()
-##More visits in 2018 followed by 2019 and 2023, the least in 2024 and 2021.
-
-#Proportion of Households recieving SNAP benefits
-hh_data %>%
-  count(snap_household) %>%
-  ggplot(aes(x = snap_household, y = n, fill = snap_household)) +
-  geom_col() +
-  labs(
-    title = "Proportion of Households Receiving SNAP",
-    x = "SNAP Household",
-    y = "Count"
-  ) +
-  theme_minimal()
-
-##Most households dont recieve SNAP benefits.
-
-
-
-# Create a small/intro model ---------------------------------------------------
-
-
-
-
-
