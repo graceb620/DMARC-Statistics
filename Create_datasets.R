@@ -388,7 +388,7 @@ hh_23 <- hh_data %>%
          first_housing_type, last_housing_type, own_or_buying,
          one_change_location, more_than_one_change_location,
          elderly, child, working_age, college_education, 
-         highest_education, kids, single_parent)
+         highest_education, kids, single_parent, first_visit_2023)
 
 write.csv(hh_data,"Data/hh_data.csv", row.names = FALSE)
 write.csv(hh_first_visit_2023,"Data/hh_first23.csv", row.names = FALSE)
