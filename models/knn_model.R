@@ -1,6 +1,3 @@
-
-
-#clear the environment
 rm(list=ls())
 
 
