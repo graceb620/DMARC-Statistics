@@ -83,3 +83,20 @@ cat("Tuned Model Accuracy:", accuracy_tuned, "\n")
 
 # The improvement is noticeable, though not huge, which suggests the original model was already well-configured
 
+# Zosia-visualizations: Visualization #1
+
+# Get importance from the tuned random forest model
+importance_data <- data.frame(
+  Factors = rownames(importance(rforest_tuned)),
+  Importance = importance(rforest_tuned, type = 1)[,1]
+)
+
+# Plot feature importance
+ggplot(importance_data, aes(x = reorder(Factors, Importance), y = Importance)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Factor Importance in Predicting First Visit in 2023",
+       x = "Factor",
+       y = "Importance (Mean Decrease in Accuracy)") +
+  theme_minimal()
+
