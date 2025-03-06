@@ -1,3 +1,6 @@
+source("Create_datasets.R") 
+library(ggplot2)
+library(dplyr)
 ##create visualizations to analyze hh_level dataset ----------------------------
 
 # Graph the First Visits per household
@@ -44,3 +47,16 @@ hh_data %>%
   theme_minimal()
 
 ##Most households dont recieve SNAP benefits.
+
+## If the hh was on snap during the first visit
+hh_data %>%
+  group_by(year = year(first_visit)) %>%
+  summarize(count = sum(snap_first_visit, na.rm = TRUE)) %>%
+  ggplot(aes(x = factor(year), y = count)) +  # Convert year to factor for proper labeling
+  geom_col(fill = "steelblue") +
+  labs(title = "Number of Households on SNAP During their First Visit per Year",
+       x = "Year",
+       y = "Number of Households") +
+  theme_minimal()
+
+
