@@ -1,6 +1,9 @@
 source("Create_datasets.R") 
 library(ggplot2)
 library(dplyr)
+
+hh_data_2023<-read.csv('Data/hh_data23.csv', stringsAsFactors=FALSE)
+
 ##create visualizations to analyze hh_level dataset ----------------------------
 
 # Graph the First Visits per household
@@ -59,4 +62,4 @@ hh_data %>%
        y = "Number of Households") +
   theme_minimal()
 
-
+##
