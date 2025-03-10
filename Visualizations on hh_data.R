@@ -50,7 +50,7 @@ hh_data %>%
 
 ## If the hh was on snap during the first visit
 hh_data %>%
-  group_by(year = year(first_visit)) %>%
+  group_by(year = year()) %>%
   summarize(count = sum(snap_first_visit, na.rm = TRUE)) %>%
   ggplot(aes(x = factor(year), y = count)) +  # Convert year to factor for proper labeling
   geom_col(fill = "steelblue") +

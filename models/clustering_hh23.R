@@ -3,7 +3,7 @@ rm(list=ls())
 library(tidyverse)
 library(RColorBrewer)
 library(reshape2)
-
+set.seed(434367540)
 hh_23<-read.csv('Data/hh_data23.csv',stringsAsFactors=FALSE)
 
 View(hh_23)
