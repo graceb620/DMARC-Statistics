@@ -3,7 +3,9 @@ rm(list=ls())
 library(tidyverse)
 library(RColorBrewer)
 library(reshape2)
-set.seed(434367540)
+
+set.seed(13032025)
+
 hh_23<-read.csv('Data/hh_data23.csv',stringsAsFactors=FALSE)
 
 View(hh_23)
@@ -11,11 +13,12 @@ View(hh_23)
 #K-means Clustering ---------
 
 #creating a subset with only numerical categories
-hh_23X <-subset(hh_23,select=-c(afn,first_visit,last_visit, first_homeless_state,
-                                last_homeless_state,first_housing_type,
-                                last_housing_type,highest_education,single_parent,elderly,
-                                child,working_age))
-
+hh_23X <-subset(hh_23,select=c(n_people_in_household,
+                               income_first,income_last,income_2023,
+                               household_income_median,income_max,income_min,
+                               fed_poverty_level_first,fed_poverty_level_2023,
+                               fed_poverty_level_avg,fed_poverty_level_max,
+                               fed_poverty_level_min))
 summary(hh_23X)
 
 #standardize the units 
@@ -39,7 +42,7 @@ ggplot()+
 #7 seems like a reasonable cutoff point
 #let's fit our k-means with k=7 clusters
 
-hh_23X_kmeans<-kmeans(hh_23Xstand,centers=7)
+hh_23X_kmeans<-kmeans(hh_23Xstand,centers=4)
 
 #show how distributions of each of the features vary across clusters
 #first, add a column of clusters onto sb_X
@@ -48,7 +51,6 @@ hh_23X$km_clusters<-as.factor(hh_23X_kmeans$cluster)
 
 #transposing - using the reshape2 package
 hh_23X_long<-melt(hh_23X,id.vars=c("km_clusters"))
-hh_23X_long
 
 ggplot(data=hh_23X_long)+
   geom_boxplot(aes(x=km_clusters,y=value,fill=km_clusters))+
@@ -58,6 +60,14 @@ ggplot(data=hh_23X_long)+
 
 hh_23$km_cluster<-as.factor(hh_23X_kmeans$cluster)
 
-#Cluster 6&7: "First visit in 2023"
-filter(hh_23,km_cluster=="7") 
-filter(hh_23,km_cluster=="6")
+#Cluster 3: Group with lowest federal poverty level in 2023
+summary(filter(hh_23,km_cluster=="1")) 
+#35% of this group had their first visit in 2023
+
+#Cluster 4: Group with highest federal poverty level in 2023
+summary(filter(hh_23,km_cluster=="4")) 
+#50% of this group had their first visit in 2023
+
+#Cluster 1: Group with highest #of people in household
+summary(filter(hh_23,km_cluster=="3")) 
+#10% of this group had their first visit in 2023
