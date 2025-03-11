@@ -20,16 +20,20 @@ test.df <- hh_23[-train.idx, ]
 
 # Select relevant predictor variables (avoiding future-dependent ones)----------
 train.df <- train.df %>%
-  select(first_visit_2023, n_people_in_household, elderly, child, working_age, 
-         single_parent, income_first, income_avg, fed_poverty_level_first, 
-         snap, snap_first_visit, one_change_location, more_than_one_change_location, 
-         first_housing_type, own_or_buying)
+  select(first_visit_2023, n_people_in_household, snap, snap_first_visit,
+         snap_change_2023, household_income_median,
+         fed_poverty_level_first, last_homeless_state, 
+         first_housing_type, last_housing_type, own_or_buying,
+         more_than_one_change_location,
+         elderly, child, working_age, college_education, single_parent)
 
 test.df <- test.df %>%
-  select(first_visit_2023, n_people_in_household, elderly, child, working_age, 
-         single_parent, income_first, income_avg, fed_poverty_level_first, 
-         snap, snap_first_visit, one_change_location, more_than_one_change_location, 
-         first_housing_type, own_or_buying)
+  select(first_visit_2023, n_people_in_household, snap, snap_first_visit,
+         snap_change_2023, household_income_median,
+         fed_poverty_level_first, last_homeless_state, 
+         first_housing_type, last_housing_type, own_or_buying,
+         more_than_one_change_location,
+         elderly, child, working_age, college_education, single_parent)
 
 # There were missing valuesin the elderly, child, and working_age columns
 train.df <- na.omit(train.df)
