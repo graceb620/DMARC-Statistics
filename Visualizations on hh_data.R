@@ -85,18 +85,19 @@ hh_data %>%
 #Edited version
 hh_data %>%
   mutate(year = year(first_visit),
-         snap_status = ifelse(snap_first_visit == 1, "SNAP", "Non-SNAP")) %>%
+         snap_status = ifelse(snap_first_visit == 1, "Yes", "No")) %>%
   filter(!year %in% c(2018, 2019, 2024)) %>%  # Remove unwanted years
   group_by(year, snap_status) %>%
   summarize(total = n(), .groups = "drop") %>%
   ggplot(aes(x = factor(year), y = total, fill = snap_status)) +  # Stacked bars
   geom_col(color = "black") +  # Black outlines for contrast
-  scale_fill_manual(values = c("SNAP" = "#E69F00", "Non-SNAP" = "#0072B2")) +  # Colorblind-friendly colors (orange & blue)
+  scale_fill_manual(values = c("Yes" = "#E69F00", "No" = "#0072B2")) + 
   geom_text(aes(label = total), position = position_stack(vjust = 0.5), color = "white", fontface = "bold") +  # Labels inside bars
-  labs(title = "New Households on SNAP vs Non-SNAP by year",
+  labs(title = "First Time Household Visits to DMARC by Year",
+       subtitle = "Focused on if the household was reveiving SNAP benefits at the time of the visit",
        x = "Year",
-       y = "Total Households",
-       fill = "Household Type") +
+       y = "# of First Time Households",
+       fill = "Reveiving SNAP\nBenefits?") +
   theme_minimal() 
 
 
