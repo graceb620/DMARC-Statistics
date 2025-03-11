@@ -1,8 +1,10 @@
-source("Create_datasets.R") 
 library(ggplot2)
 library(dplyr)
+library(lubridate)
+library(tidyr)
 
 hh_data_2023<-read.csv('Data/hh_data23.csv', stringsAsFactors=FALSE)
+hh_data <- read.csv('Data/hh_data.csv', stringsAsFactors=FALSE)
 
 ##create visualizations to analyze hh_level dataset ----------------------------
 
@@ -39,8 +41,8 @@ hh_data_2023 %>%
 
 #Proportion of Households recieving SNAP benefits
 hh_data %>%
-  count(snap_household) %>%
-  ggplot(aes(x = snap_household, y = n, fill = snap_household)) +
+  count(snap) %>%
+  ggplot(aes(x = snap, y = n, fill = snap)) +
   geom_col() +
   labs(
     title = "Proportion of Households Receiving SNAP",
@@ -53,7 +55,7 @@ hh_data %>%
 
 ## If the hh was on snap during the first visit
 hh_data %>%
-  group_by(year = year()) %>%
+  group_by(year = year(first_visit)) %>%
   summarize(count = sum(snap_first_visit, na.rm = TRUE)) %>%
   ggplot(aes(x = factor(year), y = count)) +  # Convert year to factor for proper labeling
   geom_col(fill = "steelblue") +
@@ -62,4 +64,25 @@ hh_data %>%
        y = "Number of Households") +
   theme_minimal()
 
-##
+##### Proportion of HH on snap during their first visit
+hh_data %>%
+  mutate(year = year(first_visit)) %>%
+  filter(!year %in% c(2018, 2019, 2024)) %>%  # Remove unwanted years
+  group_by(year) %>%
+  summarize(
+    count = sum(snap_first_visit, na.rm = TRUE),  # Total SNAP households
+    total_households = n()  # Total households per year
+  ) %>%
+  mutate(proportion = count / total_households) %>%  # Calculate proportion
+  ggplot(aes(x = factor(year), y = proportion)) +  # Convert year to factor for proper labeling
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = scales::percent(proportion, accuracy = 0.1)), vjust = -0.5) +  # Show percentage labels
+  labs(title = "Proportion of Households on SNAP During First Visit per Year",
+       x = "Year",
+       y = "Proportion of Households") +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +  # Format y-axis as percentages
+  theme_minimal()
+
+
+
+
