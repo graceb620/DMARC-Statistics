@@ -95,26 +95,6 @@ print(week_day_counts)
 ##But there's 57 dates that failed to parse when we were cleaning dates
 
 # HH LEVEL DATASETS INFO ----------
-# WARNING:
-# If you use group_by(afn) and try and get the "count" of x variable in a household
-# You are ONLY getting the count of the people that have gone to pick up the food
-# EVEN if you use unique(), it will only count the people that have gone to pick up the food
-# sometimes, more than one person of the family goes to pick up the food
-# e.g. if only the parent was ever getting the food, you will only get a count of that parent
-# e.g. if sometimes one parent in a family of 4 went, and another time the other parent went,
-# it will seem like there are only 2 people in that family. 
-
-# Additionally, grouping only by afn will combine the count of all the times 
-# that person went to the pantry. 
-# e.g. if you simply use sum(income), 
-# it will calculate income of that person TIMES how often they visited 
-
-# Because of this, I recommend ONLY taking the column that are the same no matter what
-# OR, you need to specifically say that you're making counts about the people that 
-# visited the pantry, not the household as a whole
-
-# the only exception to this is if we focus on single people without children
-# then, using unique() and sum() will be ok
 
 ## Create hh level dataset for ALL visits --------------
 
@@ -394,6 +374,7 @@ hh_23 <- hh_data %>%
          fed_poverty_level_first, fed_poverty_level_2023,
          fed_poverty_level_first_visit, fed_poverty_level_avg, 
          fed_poverty_level_max, fed_poverty_level_min, 
+         med_fed_poverty_level_2023,
          first_homeless_state, last_homeless_state, 
          first_housing_type, last_housing_type, own_or_buying,
          one_change_location, more_than_one_change_location,
