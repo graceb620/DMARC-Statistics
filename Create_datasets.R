@@ -246,6 +246,15 @@ hh_data <- all %>%
     fed_poverty_level_2023 = first(fed_poverty_level[year(served_date) == 2023]),  
     fed_poverty_level_2024 = first(fed_poverty_level[year(served_date) == 2024]), 
     
+    #med_fed_poverty_level by year  
+    med_fed_poverty_level_2018 = median(fed_poverty_level[year(served_date) == 2018]),  
+    med_fed_poverty_level_2019 = median(fed_poverty_level[year(served_date) == 2019]),  
+    med_fed_poverty_level_2020 = median(fed_poverty_level[year(served_date) == 2020]),
+    med_fed_poverty_level_2021 = median(fed_poverty_level[year(served_date) == 2021]),  
+    med_fed_poverty_level_2022 = median(fed_poverty_level[year(served_date) == 2022]), 
+    med_fed_poverty_level_2023 = median(fed_poverty_level[year(served_date) == 2023]),  
+    med_fed_poverty_level_2024 = median(fed_poverty_level[year(served_date) == 2024]), 
+  
     # Household income at first visit  
     fed_poverty_level_first_visit = first(fed_poverty_level[served_date == first_visit]),
     
@@ -367,6 +376,7 @@ hh_first_visit_2023 <- hh_data %>%
          fed_poverty_level_first, fed_poverty_level_2023,
          fed_poverty_level_first_visit, fed_poverty_level_avg, 
          fed_poverty_level_max, fed_poverty_level_min, 
+         med_fed_poverty_level_2023,
          first_homeless_state, last_homeless_state, 
          first_housing_type, last_housing_type, own_or_buying,
          one_change_location, more_than_one_change_location,
