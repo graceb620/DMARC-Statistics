@@ -3,9 +3,13 @@ rm(list=ls())
 library(tidyverse)
 library(RColorBrewer)
 library(reshape2)
+<<<<<<< HEAD
+set.seed(434367540)
+=======
 
 set.seed(13032025)
 
+>>>>>>> c779668f399823cafa3ac5c8fe044e2531ec8a57
 hh_23<-read.csv('Data/hh_data23.csv',stringsAsFactors=FALSE)
 
 View(hh_23)

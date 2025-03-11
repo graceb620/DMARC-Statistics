@@ -15,31 +15,26 @@ library(RColorBrewer)
 
 
 
-# Visualization #2 - Household Characteristics by First Visit Status -----------
+# Visualization #2 - Number of Households with Children with First Visit in 2023 ------
 
-# Message: Highlights the relationship between household size and income.
-# Why it’s useful: Helps identify how income varies with household size, which can inform policies on resource allocation and support programs.
-# Audience: Stakeholders who make decisions about DMARC's future operations ; Stakeholders interested in social demographics.
+# Message: Compares the number of households with and without children that made their first visit in 2023.
+# Why it’s useful: Helps identify trends in household demographics, informing decisions on how to allocate resources and address needs.
+# Audience: Stakeholders who make decisions about DMARC's future operations.
 
-#Household Income vs. Number of People in Household
-ggplot(hh_23, aes(x = n_people_in_household, y = income_first)) +
-  geom_point(alpha = 0.5, color = "blue") +
-  labs(title = "Household Income vs. Household Size",
-       x = "Number of People in Household",
-       y = "Household Income") +
+
+ggplot(hh_first_visit_2023, aes(x = first_visit, fill = as.factor(kids))) +
+  geom_histogram(binwidth = 30, position = "identity", alpha = 0.5, color = "black") +
+  scale_fill_brewer(labels = c("No Children", "Has Children")) +
+  labs(
+    title = "Proportion of First-Time Visitors with and without Children",
+    x = "First Visit Date",
+    y = "Number of Households",
+    fill = ""
+  ) +
   theme_minimal()
 
-# Household Income vs. Federal Poverty Level
-ggplot(hh_23, aes(x = fed_poverty_level_first, y = income_first)) +
-  geom_point(alpha = 0.5, color = "red") +
-  labs(title = "Household Income vs. Federal Poverty Level",
-       x = "Federal Poverty Level",
-       y = "Household Income") +
-  theme_minimal()
 
-# Used ChatGPT to help with formatting. 
-
-
+# Used ChatGPT to help with formatting.
 
 
 
