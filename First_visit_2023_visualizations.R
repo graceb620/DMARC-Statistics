@@ -37,11 +37,11 @@ hh_data_2023$poverty_cat = cut(hh_data_2023$fed_poverty_level_first_visit,
 
 hh_data_2023$first_visit_2023 <- as.factor(hh_data_2023$first_visit_2023)
 
-hh_data_2023 <- filter(poverty_cat=="NA")
+hh_data_2023 <- hh_data_2023 %>% filter(poverty_cat!="NA") 
 
 # ggplot to compare 
 ggplot(hh_data_2023, aes(x=poverty_cat)) + 
-  geom_bar(aes(fill=first_visit_2023),position = "dodge") + xlab("First Visit") + 
-  ylab("Median Household Income") +
-  labs(title="Comparison of median household income of visitors in 2023 above $0 and below $200,000",
-       subtitle="between households who first visited in 2023 and who first visited earlier")
+  geom_bar(aes(fill=first_visit_2023),position = "fill") + xlab("Categories") + 
+  ylab("% of households") +
+  labs(title="Proportions between visitors that first visited in 2023 versus other years",
+       subtitle="comparison between categories of those that visited DMARC pantries in 2023")
