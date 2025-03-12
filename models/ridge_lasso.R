@@ -18,30 +18,37 @@ test.df <- hh_23[-train.idx, ]
 
 # Select relevant predictor variables (avoiding future-dependent ones)----------
 train.df <- train.df %>%
-  select(first_visit_2023, n_people_in_household, elderly, child, working_age,
-         single_parent, income_first, income_avg, fed_poverty_level_first,
-         snap, snap_first_visit, one_change_location, more_than_one_change_location,
-         first_housing_type, own_or_buying)
+  select(first_visit_2023, n_people_in_household, snap, snap_first_visit,
+         snap_change_2023, household_income_median,
+         fed_poverty_level_first, last_homeless_state, 
+         first_housing_type, last_housing_type, own_or_buying,
+         more_than_one_change_location,
+         elderly, child, working_age, college_education, single_parent)
 
 test.df <- test.df %>%
-  select(first_visit_2023, n_people_in_household, elderly, child, working_age,
-         single_parent, income_first, income_avg, fed_poverty_level_first,
-         snap, snap_first_visit, one_change_location, more_than_one_change_location,
-         first_housing_type, own_or_buying)
+  select(first_visit_2023, n_people_in_household, snap, snap_first_visit,
+         snap_change_2023, household_income_median,
+         fed_poverty_level_first, last_homeless_state, 
+         first_housing_type, last_housing_type, own_or_buying,
+         more_than_one_change_location,
+         elderly, child, working_age, college_education, single_parent)
 
 # Remove rows with missing values in the train and test sets
 train.df <- train.df[complete.cases(train.df), ]
 test.df <- test.df[complete.cases(test.df), ]
 
-# Recreate x.train and y.train after removing NAs
-x.train <- model.matrix(first_visit_2023 ~ n_people_in_household + elderly + child + working_age +
-                          single_parent + income_first + income_avg + fed_poverty_level_first +
-                          snap + snap_first_visit + one_change_location + more_than_one_change_location +
-                          first_housing_type + own_or_buying, data = train.df)[,-1]
-x.test <- model.matrix(first_visit_2023 ~ n_people_in_household + elderly + child + working_age +
-                         single_parent + income_first + income_avg + fed_poverty_level_first +
-                         snap + snap_first_visit + one_change_location + more_than_one_change_location +
-                         first_housing_type + own_or_buying, data = test.df)[,-1]
+# Recreate x.train and x.test after removing NAs, ensuring variable consistency
+x.train <- model.matrix(first_visit_2023 ~ n_people_in_household + snap + snap_first_visit +
+                          snap_change_2023 + household_income_median + fed_poverty_level_first +
+                          last_homeless_state + first_housing_type + last_housing_type +
+                          own_or_buying + more_than_one_change_location + elderly + child +
+                          working_age + college_education + single_parent, data = train.df)[,-1]
+
+x.test <- model.matrix(first_visit_2023 ~ n_people_in_household + snap + snap_first_visit +
+                         snap_change_2023 + household_income_median + fed_poverty_level_first +
+                         last_homeless_state + first_housing_type + last_housing_type +
+                         own_or_buying + more_than_one_change_location + elderly + child +
+                         working_age + college_education + single_parent, data = test.df)[,-1]
 
 # Define the target variable for regression
 y.train <- as.vector(train.df$first_visit_2023)
@@ -114,3 +121,34 @@ ggplot() +
   scale_colour_brewer(palette = "Paired") +
   labs(x = "1 - Specificity", y = "Sensitivity", color = "Model") +
   theme_minimal()
+
+# Lasso Coefficients -----------------------------------------------------------
+# Convert the sparse matrix to a dense matrix
+lasso_coefficients <- as.data.frame(as.matrix(coef(final_lasso)))
+
+# Remove the intercept
+lasso_coefficients <- lasso_coefficients[-1, , drop = FALSE]
+
+# Rename the row names (optional)
+rownames(lasso_coefficients) <- rownames(lasso_coefficients)
+colnames(lasso_coefficients) <- "Coefficient"
+
+# View the coefficients
+print(lasso_coefficients)
+
+# Ridge Coefficients -----------------------------------------------------------
+# Convert the sparse matrix to a dense matrix
+ridge_coefficients <- as.data.frame(as.matrix(coef(final_ridge)))
+
+# Remove the intercept
+ridge_coefficients <- ridge_coefficients[-1, , drop = FALSE]
+
+# Rename the row names (optional)
+rownames(ridge_coefficients) <- rownames(ridge_coefficients)
+colnames(ridge_coefficients) <- "Coefficient"
+
+# View the coefficients
+print(ridge_coefficients)
+
+
+

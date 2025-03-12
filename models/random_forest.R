@@ -4,6 +4,7 @@ library(RColorBrewer)
 library(reshape2)
 library(randomForest)
 library(caret)  # For model evaluation
+library(pROC)
 
 # Read in data -----------------------------------------------------------------
 hh_23 <- read.csv('Data/hh_data23.csv',stringsAsFactors=FALSE)
@@ -35,7 +36,7 @@ test.df <- test.df %>%
          more_than_one_change_location,
          elderly, child, working_age, college_education, single_parent)
 
-# There were missing valuesin the elderly, child, and working_age columns
+# There were missing values in the elderly, child, and working_age columns
 train.df <- na.omit(train.df)
 
 
@@ -80,6 +81,20 @@ rforest_tuned <- randomForest(first_visit_2023 ~ .,
 pred_tuned <- predict(rforest_tuned, test.df)
 conf_matrix_tuned <- confusionMatrix(pred_tuned, test.df$first_visit_2023)
 print(conf_matrix_tuned)
+
+# Convert predictions to probability scores
+prob_tuned <- predict(rforest_tuned, test.df, type = "prob")
+
+# Compute ROC curve and AUC for the positive class (assuming "1" is the positive class)
+roc_curve <- roc(test.df$first_visit_2023, prob_tuned[, 2], levels = rev(levels(test.df$first_visit_2023)))
+
+# Plot ROC Curve
+plot(roc_curve, col = "blue", main = "ROC Curve for Tuned Random Forest Model")
+abline(a = 0, b = 1, lty = 2, col = "red")
+
+# Print AUC
+auc_value <- auc(roc_curve)
+cat("AUC:", auc_value, "\n")
 
 # Extract and Compare Accuracy
 accuracy_tuned <- conf_matrix_tuned$overall["Accuracy"]
