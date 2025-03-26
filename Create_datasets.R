@@ -114,6 +114,8 @@ hh_data <- all %>%
     first_visit_2023 = if_else(year(first_visit) == 2023, 1, 0),
     first_visit_2024 = if_else(year(first_visit) == 2024, 1, 0),
     
+    first_visit_zip = first(zip), # zip code during first visit
+    
     # Snap related Variables
     # SNAP Benefits in general
     snap = as.integer(any(snap_household == "Y", na.rm = TRUE)),
@@ -349,7 +351,7 @@ hh_data <- hh_data %>%
 hh_first_visit_2023 <- hh_data %>%
   filter(year(first_visit) == 2023) %>%
   select(afn, n_people_in_household, first_visit, last_visit,
-         snap, snap_first_visit, snap_first_2023,
+         first_visit_zip, snap, snap_first_visit, snap_first_2023,
          snap_change_2023, snap_proportion_2023,
          income_first, income_last, income_2023, income_avg, 
          income_max, income_min, household_income_median,
@@ -367,7 +369,7 @@ hh_first_visit_2023 <- hh_data %>%
 hh_23 <- hh_data %>%
   filter(year(last_visit) == 2023) %>%
   select(afn, n_people_in_household, first_visit, last_visit,
-         snap, snap_first_visit, snap_first_2023,
+         first_visit_zip, snap, snap_first_visit, snap_first_2023,
          snap_change_2023, snap_proportion_2023,
          income_first, income_last, income_2023, income_avg, 
          income_max, income_min, household_income_median,
@@ -381,9 +383,87 @@ hh_23 <- hh_data %>%
          elderly, child, working_age, college_education, 
          highest_education, kids, single_parent, first_visit_2023)
 
-write.csv(hh_data,"Data/hh_data.csv", row.names = FALSE)
-write.csv(hh_first_visit_2023,"Data/hh_first23.csv", row.names = FALSE)
-write.csv(hh_23,"Data/hh_data23.csv", row.names = FALSE)
+# Create a hh level dataset for all people whose first visit was in 2022
+hh_first_visit_2022 <- hh_data %>%
+  filter(year(first_visit) == 2022) %>%
+  select(afn, n_people_in_household, first_visit, last_visit,
+         first_visit_zip, snap, snap_first_visit, snap_first_2022,
+         snap_change_2022, snap_proportion_2022,
+         income_first, income_last, income_2022, income_avg, 
+         income_max, income_min, household_income_median,
+         fed_poverty_level_first, fed_poverty_level_2022,
+         fed_poverty_level_first_visit, fed_poverty_level_avg, 
+         fed_poverty_level_max, fed_poverty_level_min, 
+         med_fed_poverty_level_2022,
+         first_homeless_state, last_homeless_state, 
+         first_housing_type, last_housing_type, own_or_buying,
+         one_change_location, more_than_one_change_location,
+         elderly, child, working_age, college_education, 
+         highest_education, kids, single_parent)
+
+# Create a hh level dataset for all people who visited in 2022
+hh_22 <- hh_data %>%
+  filter(year(last_visit) == 2022) %>%
+  select(afn, n_people_in_household, first_visit, last_visit,
+         first_visit_zip, snap, snap_first_visit, snap_first_2022,
+         snap_change_2022, snap_proportion_2022,
+         income_first, income_last, income_2022, income_avg, 
+         income_max, income_min, household_income_median,
+         fed_poverty_level_first, fed_poverty_level_2022,
+         fed_poverty_level_first_visit, fed_poverty_level_avg, 
+         fed_poverty_level_max, fed_poverty_level_min, 
+         med_fed_poverty_level_2022,
+         first_homeless_state, last_homeless_state, 
+         first_housing_type, last_housing_type, own_or_buying,
+         one_change_location, more_than_one_change_location,
+         elderly, child, working_age, college_education, 
+         highest_education, kids, single_parent, first_visit_2022)
+
+# Create a hh level dataset for all people whose first visit was in 2021
+hh_first_visit_2021 <- hh_data %>%
+  filter(year(first_visit) == 2021) %>%
+  select(afn, n_people_in_household, first_visit, last_visit,
+         first_visit_zip, snap, snap_first_visit, snap_first_2021,
+         snap_change_2021, snap_proportion_2021,
+         income_first, income_last, income_2021, income_avg, 
+         income_max, income_min, household_income_median,
+         fed_poverty_level_first, fed_poverty_level_2021,
+         fed_poverty_level_first_visit, fed_poverty_level_avg, 
+         fed_poverty_level_max, fed_poverty_level_min, 
+         med_fed_poverty_level_2021,
+         first_homeless_state, last_homeless_state, 
+         first_housing_type, last_housing_type, own_or_buying,
+         one_change_location, more_than_one_change_location,
+         elderly, child, working_age, college_education, 
+         highest_education, kids, single_parent)
+
+# Create a hh level dataset for all people who visited in 2021
+hh_21 <- hh_data %>%
+  filter(year(last_visit) == 2021) %>%
+  select(afn, n_people_in_household, first_visit, last_visit,
+         first_visit_zip, snap, snap_first_visit, snap_first_2021,
+         snap_change_2021, snap_proportion_2021,
+         income_first, income_last, income_2021, income_avg, 
+         income_max, income_min, household_income_median,
+         fed_poverty_level_first, fed_poverty_level_2021,
+         fed_poverty_level_first_visit, fed_poverty_level_avg, 
+         fed_poverty_level_max, fed_poverty_level_min, 
+         med_fed_poverty_level_2021,
+         first_homeless_state, last_homeless_state, 
+         first_housing_type, last_housing_type, own_or_buying,
+         one_change_location, more_than_one_change_location,
+         elderly, child, working_age, college_education, 
+         highest_education, kids, single_parent, first_visit_2021)
+
+
+write.csv(hh_data, "Data/hh_data.csv", row.names = FALSE)
+write.csv(hh_first_visit_2023, "Data/hh_first23.csv", row.names = FALSE)
+write.csv(hh_23, "Data/hh_data23.csv", row.names = FALSE)
+write.csv(hh_first_visit_2022, "Data/hh_first22.csv", row.names = FALSE)
+write.csv(hh_22, "Data/hh_data22.csv", row.names = FALSE)
+write.csv(hh_first_visit_2021, "Data/hh_first21.csv", row.names = FALSE)
+write.csv(hh_21, "Data/hh_data21.csv", row.names = FALSE)
+
 
 # Verify that it only found 2023 first visits
 #hh_data %>%
