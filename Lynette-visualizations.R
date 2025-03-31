@@ -27,21 +27,5 @@ hh_data_2023 %>%
 #change the heading too 
 #reduce the number on the chart
 
-#housing type comparison for first time visitors in 2023 vs other years
-hh_data_2023 %>%
-  mutate(first_visit_2023 = ifelse(year(first_visit) == 2023, "2023", "Other Years")) %>%
-  ggplot(aes(x = first_housing_type, fill = first_visit_2023)) +
-  geom_bar(position = "dodge") +
-  labs(
-    title = "Comparison of First Housing Type: 2023 vs. Other Years",
-    x = "First Housing Type",
-    y = "Count",
-    fill = "First Visit Year"
-  ) +
-  scale_fill_manual(values = c("2023" = "#E69F00", "Other Years" = "#0072B2")) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
-#change the title it looks like its comparing years
-
 
 
