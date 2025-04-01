@@ -90,7 +90,7 @@ for (year in 2019:2023) {
   }
 }
 
-### --- Pulling API_HHIncome -------------------------------------------------
+### --- Pulling API_MedHHIncome -------------------------------------------------
 API_HHIncome <- "B19013_001E" # Single Parent household
 API_HHIncome_DataFrame <- data.frame()
 
