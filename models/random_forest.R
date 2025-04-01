@@ -1,10 +1,11 @@
-rm(list=ls()) 
+rm(list=ls())
 library(tidyverse)
 library(RColorBrewer)
 library(reshape2)
 library(randomForest)
-library(caret)  # For model evaluation
+library(caret) # For model evaluation
 library(pROC)
+library(pdp)
 
 # Read in data -----------------------------------------------------------------
 hh_23 <- read.csv('Data/hh_data23.csv',stringsAsFactors=FALSE)
@@ -20,33 +21,14 @@ train.df <- hh_23[train.idx, ]
 test.df <- hh_23[-train.idx, ]
 
 # Select relevant predictor variables (avoiding future-dependent ones)----------
-train.df <- train.df %>%
-  select(first_visit_2023, n_people_in_household, snap, snap_first_visit,
-         snap_change_2023, household_income_median,
-         fed_poverty_level_first, last_homeless_state, 
-         first_housing_type, last_housing_type, own_or_buying,
-         more_than_one_change_location,
-         elderly, child, working_age, college_education, single_parent)
-
-test.df <- test.df %>%
-  select(first_visit_2023, n_people_in_household, snap, snap_first_visit,
-         snap_change_2023, household_income_median,
-         fed_poverty_level_first, last_homeless_state, 
-         first_housing_type, last_housing_type, own_or_buying,
-         more_than_one_change_location,
-         elderly, child, working_age, college_education, single_parent)
+train.df <- train.df %>% select(first_visit_2023, n_people_in_household, snap, snap_first_visit, snap_change_2023, household_income_median, fed_poverty_level_first, last_homeless_state, first_housing_type, last_housing_type, own_or_buying, more_than_one_change_location, elderly, child, working_age, college_education, single_parent)
+test.df <- test.df %>% select(first_visit_2023, n_people_in_household, snap, snap_first_visit, snap_change_2023, household_income_median, fed_poverty_level_first, last_homeless_state, first_housing_type, last_housing_type, own_or_buying, more_than_one_change_location, elderly, child, working_age, college_education, single_parent)
 
 # There were missing values in the elderly, child, and working_age columns
 train.df <- na.omit(train.df)
 
-
 # Fit Random Forest Model ------------------------------------------------------
-rforest <- randomForest(first_visit_2023 ~ ., 
-                        data = train.df, 
-                        ntree = 1000, 
-                        mtry = 3, 
-                        importance = TRUE)
-
+rforest <- randomForest(first_visit_2023 ~ ., data = train.df, ntree = 1000, mtry = 3, importance = TRUE)
 
 # Print model summary
 print(rforest)
@@ -65,17 +47,12 @@ print(conf_matrix)
 accuracy <- conf_matrix$overall["Accuracy"]
 cat("Model Accuracy:", accuracy, "\n")
 
-# Tune Model by Adjusting `mtry` -----------------------------------------------
+# Tune Model by Adjusting mtry -----------------------------------------------
 tuned_rf <- tuneRF(train.df[, -1], train.df$first_visit_2023, stepFactor = 1.5, improve = 0.01, ntreeTry = 500)
 
-# Test Again with Adjusted `mtry` ----------------------------------------------
-best_mtry <- tuned_rf[which.min(tuned_rf[,2]), 1]  # Find best mtry
-rforest_tuned <- randomForest(first_visit_2023 ~ ., 
-                              data = train.df, 
-                              ntree = 1000, 
-                              mtry = best_mtry, 
-                              importance = TRUE,
-                              classwt = c(1, 1.5)) # Give more weight to minority class (?)
+# Test Again with Adjusted mtry ----------------------------------------------
+best_mtry <- tuned_rf[which.min(tuned_rf[,2]), 1] # Find best mtry
+rforest_tuned <- randomForest(first_visit_2023 ~ ., data = train.df, ntree = 1000, mtry = best_mtry, importance = TRUE, classwt = c(1, 1.5)) # Give more weight to minority class (?)
 
 # Predictions on Test Set (Tuned Model) ----------------------------------------
 pred_tuned <- predict(rforest_tuned, test.df)
@@ -102,8 +79,6 @@ cat("Tuned Model Accuracy:", accuracy_tuned, "\n")
 
 # The improvement is noticeable, though not huge, which suggests the original model was already well-configured
 
-# Zosia-visualizations: Visualization #1
-
 # Get importance from the tuned random forest model
 importance_data <- data.frame(
   Factors = rownames(importance(rforest_tuned)),
@@ -114,8 +89,31 @@ importance_data <- data.frame(
 ggplot(importance_data, aes(x = reorder(Factors, Importance), y = Importance)) +
   geom_bar(stat = "identity", fill = "steelblue") +
   coord_flip() +
-  labs(title = "Factor Importance in Predicting First Visit in 2023",
-       x = "Factor",
-       y = "Importance (Mean Decrease in Accuracy)") +
+  labs(title = "Factor Importance in Predicting First Visit in 2023", x = "Factor", y = "Importance (Mean Decrease in Accuracy)") +
   theme_minimal()
 
+# THIS IS SOME BS
+
+# Partial Dependence Plots to further understand relationships
+# Example for 'household_income_median'
+pdp_income <- partial(rforest_tuned, pred.var = "household_income_median", prob = TRUE)
+plot_pdp_income <- plotPartial(pdp_income, main = "Partial Dependence of Household Income")
+print(plot_pdp_income)
+
+# Example for 'snap_change_2023'
+pdp_snap_change <- partial(rforest_tuned, pred.var = "snap_change_2023", prob = TRUE)
+plot_pdp_snap_change <- plotPartial(pdp_snap_change, main = "Partial Dependence of SNAP Change")
+print(plot_pdp_snap_change)
+
+# Add a section to analyze the distribution of important features
+# Example for household income
+ggplot(train.df, aes(x = household_income_median)) +
+  geom_histogram(bins = 30, fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Household Income", x = "Household Income Median") +
+  theme_minimal()
+
+# Example for snap change (categorical)
+ggplot(train.df, aes(x = as.factor(snap_change_2023))) + # Treat as factor
+  geom_bar(fill = "lightgreen", color = "black") +
+  labs(title = "Distribution of SNAP Change 2023", x = "SNAP Change 2023 (0/1)") +
+  theme_minimal()
