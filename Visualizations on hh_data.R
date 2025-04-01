@@ -66,39 +66,23 @@ hh_data %>%
 
 ##### Proportion of HH on snap during their first visit
 hh_data %>%
-  mutate(year = year(first_visit)) %>%
-  filter(!year %in% c(2018, 2019, 2024)) %>%  # Remove unwanted years
-  group_by(year) %>%
-  summarize(
-    count = sum(snap_first_visit, na.rm = TRUE),  # Total SNAP households
-    total_households = n()  # Total households per year
-  ) %>%
-  mutate(proportion = count / total_households) %>%  # Calculate proportion
-  ggplot(aes(x = factor(year), y = proportion)) +  # Convert year to factor for proper labeling
-  geom_col(fill = "steelblue") +
-  geom_text(aes(label = scales::percent(proportion, accuracy = 0.1)), vjust = -0.5) +  # Show percentage labels
-  labs(title = "Proportion of Households on SNAP During First Visit per Year",
-       x = "Year",
-       y = "Proportion of Households") +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +  # Format y-axis as percentages
-  theme_minimal()
-#Edited version
-hh_data %>%
   mutate(year = year(first_visit),
          snap_status = ifelse(snap_first_visit == 1, "Yes", "No")) %>%
   filter(!year %in% c(2018, 2019, 2024)) %>%  # Remove unwanted years
   group_by(year, snap_status) %>%
-  summarize(total = n(), .groups = "drop") %>%
+  summarize(total = n(), .groups = "drop") %>%  # Count unique first-time visits per year
   ggplot(aes(x = factor(year), y = total, fill = snap_status)) +  # Stacked bars
   geom_col(color = "black") +  # Black outlines for contrast
   scale_fill_manual(values = c("Yes" = "#E69F00", "No" = "#0072B2")) + 
   geom_text(aes(label = total), position = position_stack(vjust = 0.5), color = "white", fontface = "bold") +  # Labels inside bars
   labs(title = "First Time Household Visits to DMARC by Year",
-       subtitle = "Focused on if the household was reveiving SNAP benefits at the time of the visit",
+       subtitle = "Focused on if the household was receiving SNAP benefits at the time of the visit",
        x = "Year",
        y = "# of First Time Households",
-       fill = "Reveiving SNAP\nBenefits?") +
-  theme_minimal() 
+       fill = "Receiving SNAP\nBenefits?") +
+  theme_minimal()
+
+
 
 
 
