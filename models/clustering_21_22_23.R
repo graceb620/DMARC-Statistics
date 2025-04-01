@@ -130,11 +130,11 @@ hh_first23$km_cluster<-as.factor(hh_first23X_kmeans$cluster)
 
 #Cluster 1: Group with highest federal poverty level in 2023
 summary(filter(hh_first23,km_cluster=="1")) 
-highest_poverty23<-filter(hh_first22,km_cluster=="1")
+highest_povertylevel23<-filter(hh_first23,km_cluster=="1")
 
 #Cluster 2: Group with lowest federal poverty level in 2023
 summary(filter(hh_first23,km_cluster=="2")) 
-lowest_poverty23<-filter(hh_first22,km_cluster=="2")
+lowest_povertylevel23<-filter(hh_first23,km_cluster=="2")
 
 # ONLY 2022 first visitors --------
 
@@ -194,11 +194,11 @@ hh_first22$km_cluster<-as.factor(hh_first22X_kmeans$cluster)
 
 #Cluster 2: Group with highest federal poverty level in 2022
 summary(filter(hh_first22,km_cluster=="2")) 
-highest_poverty22<-filter(hh_first22,km_cluster=="2")
+highest_povertylevel22<-filter(hh_first22,km_cluster=="2")
 
 #Cluster 3: Group with lowest federal poverty level in 2022
 summary(filter(hh_first22,km_cluster=="3")) 
-lowest_poverty22<-filter(hh_first22,km_cluster=="3")
+lowest_povertylevel22<-filter(hh_first22,km_cluster=="3")
 
 # ONLY 2021 first visitors ------
 
@@ -258,11 +258,11 @@ hh_first21$km_cluster<-as.factor(hh_first21X_kmeans$cluster)
 
 #Cluster 2: Group with highest federal poverty level in 2021
 summary(filter(hh_first21,km_cluster=="1"))
-highest_poverty21<-filter(hh_first21,km_cluster=="1")
+highest_povertylevel21<-filter(hh_first21,km_cluster=="1")
 
 #Cluster 3: Group with lowest federal poverty level in 2021
 summary(filter(hh_first21,km_cluster=="3")) 
-lowest_poverty21<-filter(hh_first21,km_cluster=="1")
+lowest_povertylevel21<-filter(hh_first21,km_cluster=="1")
 
 
 # Visualizations - comparisons ------
@@ -298,11 +298,6 @@ ggplot(hh_data1, aes(x=first_year, y = n_people_in_household, group=first_year))
 #Very minimal change
 
 
-#highest poverty dataset
-merged_df <- merge(highest_poverty21,highest_poverty22,highest_poverty23,by = "afn", all = TRUE)
-
-merged_df <- merge(highest_poverty21,highest_poverty22,highest_poverty23,by = "afn", all = TRUE)
-
 #Previous work:
 
 # # There are a few outliers with median income above 200000 - remove them
@@ -330,4 +325,7 @@ merged_df <- merge(highest_poverty21,highest_poverty22,highest_poverty23,by = "a
 #        subtitle="between households who first visited in 2023 and who first visited earlier")
 # 
 # 
-# 
+
+summary(highest_povertylevel21)
+
+summary(highest_povertylevel22)
