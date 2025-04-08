@@ -3,6 +3,7 @@ library(tidyverse)
 library(caret) # For model evaluation
 library(glmnet) # For Ridge and Lasso models
 library(pROC)
+source("Create_datasets.R") 
 
 # Read in data -----------------------------------------------------------------
 hh_23 <- read.csv('Data/hh_data23.csv', stringsAsFactors = FALSE)
@@ -128,6 +129,83 @@ ridge_coef_plot <- ggplot(data = ridge_coefficients, aes(x = rownames(ridge_coef
 
 print(lasso_coef_plot)
 print(ridge_coef_plot)
+
+# We're gonna go with Lasso (a more interpretable model - fewer predictors kept)
+# high sensitivity - good for catching all new households
+# high specificity - good for avoiding false positives
+
+#Coefficient interpretations:
+# 1. snap = -2.83 - Households already receiving SNAP are much less likely to be first-time visitors in 2023
+# 2. elderly = -0.75 and single_parent = -0.37 - Elderly households and single parents were less likely to be first-time visitors (perhaps they are returners)
+# 3. child = +0.49 and college_education = +0.35 - Households with children or someone with college education were more likely to be new
+# 4. more_than_one_change_location = -2.91 - Those with more than one location change were much less likely to be new visitors - unstable households are likely returners, not new.
+
+# Potential takeaways:
+# 1. Target outreach toward households with kids and working-age adults not on SNAP — they might be more likely to be new.
+# 2. Location instability (more than one change) may reflect long-term users.
+# 3. Consider creating tailored intake workflows for elderly or single-parent households since they tend to be recurring users.
+
+# Look at more than one change of location:
+
+# DOES NOT WORK
+
+# First-time visits by Change of Location
+hh_data_summary_change_location <- hh_data %>%
+  filter(between(year(first_visit), 2020, 2023) & more_than_one_change_location == 1) %>%
+  mutate(visit_year = floor_date(first_visit, "year")) %>%
+  count(visit_year, more_than_one_change_location) %>%
+  group_by(visit_year) %>%
+  mutate(percent = (n / sum(n)) * 100)
+
+# Plot: Change of Location among First-Time Visitors
+ggplot(hh_data_summary_change_location, aes(
+  x = visit_year,
+  y = percent,
+  fill = factor(more_than_one_change_location, levels = c(1, 0), labels = c("Yes", "No"))
+)) +
+  geom_bar(stat = "identity", position = "stack", color = "black") +
+  geom_text(aes(label = round(percent, 1)), position = position_stack(vjust = 0.5),
+            color = "white", fontface = "bold", size = 3) +
+  scale_fill_manual(values = c("Yes" = "#E69F00", "No" = "#56B4E9")) +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  labs(
+    title = "Proportion of First-Time Pantry Visitors by Reported Change of Location",
+    subtitle = "Data from 2020 to 2023",
+    x = "First Visit Year",
+    y = "Percentage of Visiting Households",
+    fill = "more_than_one_change_location"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+#Returners
+hh_data_returners <- hh_data %>%
+  filter(first_visit != last_visit & between(year(last_visit), 2020, 2023)) %>%
+  mutate(visit_year = floor_date(last_visit, "year")) %>%
+  count(visit_year, more_than_one_change_location) %>%
+  group_by(visit_year) %>%
+  mutate(percent = (n / sum(n)) * 100)
+
+# Plot
+ggplot(hh_data_returners, aes(x = visit_year, y = percent, fill = factor(more_than_one_change_location, 
+                                                                         levels = c(0, 1), labels = c("No", "Yes")))) +
+  geom_bar(stat = "identity", position = "stack", color = "black") +
+  geom_text(aes(label = round(percent, 1)), position = position_stack(vjust = 0.5),
+            color = "white", fontface = "bold", size = 3) +
+  scale_fill_manual(values = c("Yes" = "#E69F00", "No" = "#56B4E9")) +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  labs(
+    title = "Proportion of Returner Pantry Visitors by Location Change",
+    subtitle = "Data from 2020 to 2023",
+    x = "Last Visit Year",
+    y = "Percentage of Visiting Households",
+    fill = "More Than One Change in Location"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
 
 
 
