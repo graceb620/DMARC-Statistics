@@ -12,3 +12,4 @@ Data/
 Team_exercise.R
 DMARC-Statistics.Rproj
 *.Rproj
+.DS_Store
