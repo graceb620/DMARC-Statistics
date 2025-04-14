@@ -500,12 +500,12 @@ zipcodes_2019 <- API_HHIncome_DataFrame %>%
 #   filter(`zip code tabulation area` %in% zipcodes_2019$`zip code tabulation area`)
 
 # --- Merging the columns -----------------
-API_data <- reduce(list(API_HHIncome_DataFrame, API_NumHH_DataFrame, API_SnapHH_DataFrame), 
+API_data_5yr <- reduce(list(API_HHIncome_DataFrame, API_NumHH_DataFrame, API_SnapHH_DataFrame), 
                    full_join, by = c("zip code tabulation area", 
                                      "year", "state", "NAME")) 
 
 # --- Creating large dataset
-API_data <- API_data %>% rename(
+API_data_5yr <- API_data %>% rename(
   Med_HHIncome = B19013_001E,
   NumHH = B11016_001E,
   SnapHH = B22003_001E,
@@ -520,7 +520,7 @@ zipcodes_2019 <- API_HHIncome_DataFrame %>%
   filter(year == 2019) %>% 
   select(`zip code tabulation area`) %>%
   distinct()  # Ensure unique ZIP codes
-API_data <- API_data %>% 
+API_data_5yr <- API_data_5yr %>% 
   filter(zip_code %in% zipcodes_2019$`zip code tabulation area`) 
 
 # --- Creating Datasets for each individual year -------

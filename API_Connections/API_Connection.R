@@ -1,3 +1,6 @@
+### READ THIS: THis doc is not meant to be run,
+### There is a line that will run this doc on the Create_datasets.R
+
 library(httr)
 library(jsonlite)
 library(dplyr)
@@ -131,6 +134,8 @@ for (year in 2019:2023) {
     print(paste("Error fetching data for", year, ":", status_code(response)))
   }
 }
+
+### --- Looking at the 1 year census data --------------------------------------
 
 
 
