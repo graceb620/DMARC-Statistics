@@ -1,10 +1,8 @@
 library(ggplot2)
 library(dplyr)
-library(lubridate)
-library(tidyr)
 
 hh_data_2023<-read.csv('Data/hh_data23.csv', stringsAsFactors=FALSE)
-hh_data <- read.csv('Data/hh_data.csv', stringsAsFactors=FALSE)
+hh_data <- read.csv('Data/hh_data.csv', stringsAsFactors = FALSE)
 
 ##create visualizations to analyze hh_level dataset ----------------------------
 
@@ -41,8 +39,8 @@ hh_data_2023 %>%
 
 #Proportion of Households recieving SNAP benefits
 hh_data %>%
-  count(snap) %>%
-  ggplot(aes(x = snap, y = n, fill = snap)) +
+  count(snap_household) %>%
+  ggplot(aes(x = snap_household, y = n, fill = snap_household)) +
   geom_col() +
   labs(
     title = "Proportion of Households Receiving SNAP",
@@ -55,7 +53,7 @@ hh_data %>%
 
 ## If the hh was on snap during the first visit
 hh_data %>%
-  group_by(year = year(first_visit)) %>%
+  group_by(year = year()) %>%
   summarize(count = sum(snap_first_visit, na.rm = TRUE)) %>%
   ggplot(aes(x = factor(year), y = count)) +  # Convert year to factor for proper labeling
   geom_col(fill = "steelblue") +
@@ -64,28 +62,4 @@ hh_data %>%
        y = "Number of Households") +
   theme_minimal()
 
-##### Proportion of HH on snap during their first visit
-hh_data %>%
-  mutate(year = year(first_visit),
-         snap_status = ifelse(snap_first_visit == 1, "Yes", "No")) %>%
-  filter(!year %in% c(2018, 2019, 2024)) %>%  # Remove unwanted years
-  group_by(year, snap_status) %>%
-  summarize(total = n(), .groups = "drop") %>%  # Count unique first-time visits per year
-  ggplot(aes(x = factor(year), y = total, fill = snap_status)) +  # Stacked bars
-  geom_col(color = "black") +  # Black outlines for contrast
-  scale_fill_manual(values = c("Yes" = "#E69F00", "No" = "#0072B2")) + 
-  geom_text(aes(label = total), position = position_stack(vjust = 0.5), color = "white", fontface = "bold") +  # Labels inside bars
-  labs(title = "First Time Household Visits to DMARC by Year",
-       subtitle = "Focused on if the household was receiving SNAP benefits at the time of the visit",
-       x = "Year",
-       y = "# of First Time Households",
-       fill = "Receiving SNAP\nBenefits?") +
-  theme_minimal()
-
-
-
-
-
-
-
-
+##
