@@ -10,11 +10,19 @@ colnames(newData)
 all2 <- newData %>% 
   mutate(
     servedDate = ymd_hms(servedDate), #converts to desired date format
-    servedDate = as_date(servedDate), #only grabs date
-    dob=ymd(dob),
-    age=year(Sys.Date())-year(dob)
+    servedDate = as_date(servedDate) #only grabs date
   )
-colnames(all2)
+
+summary(all2) # Checking to make sure that all of the columns are in the desired
+# format and of reasonable value 
+# Noticed that the age range was from -7974.49 and 2024 i want to check the entries
+# where the age is <0 and >120
+# test <- all2 %>%
+#   group_by(clientId) %>%
+#   filter(age < 0 | age > 120)
+# There are 139 entries where the dob entry appears to have been entered incorrect
+# We decided as a group that it would be better to just remove DOB as a variable
+
 
 ### --- Create a visit level data set -----------------------------------------
 visit2 <- all2 %>% 
@@ -39,8 +47,6 @@ individuals <- all2 %>%
   group_by(clientId) %>% 
   summarize(
     afn = first(houseHoldIdAfn),
-    dob = first(dob),
-    age = first(age),
     gender = first(gender),
     race = first(race),
     education = first(education),
@@ -77,12 +83,22 @@ hh_data2 <- all2 %>%
     
     dietary_issue = as.integer(any(!dietaryIssue %in% c("None", "Unknown"))),
     
-    oldest_member = max(age),
-    youngest_member = min(age),
-    
     veteran = as.integer(any(veteran == "Yes"))
   )
+
+hh2_2024 <- hh_data2 %>%
+  filter(visit_in_2024=="1") %>% 
+  select(householdMembers, visit_count_2024, IncomeSource, fedPovertyLevel,
+         annualIncome, foodstamps, primary_visit_location, primary_service,
+         primary_visitor_occupation, dietary_issue, veteran)
   
+  
+### --- Create CSV's -----------------------------------------------------------
+write.csv(hh_data2, "Data/hh_data2.csv", row.names = FALSE)
+write.csv(individuals, "Data/individual.csv", row.names=FALSE)
+write.csv(visit2, "Data/visit2.csv", row.names=FALSE)
+write.csv(hh2_2024, "Data/hh2_2024", row.names=FALSE)
+
 
 
 
