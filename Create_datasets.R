@@ -12,8 +12,6 @@
 # Subset zipcodes to the first 5 digits
 
 # Housekeeping Items -----------------------------------------------------------
-rm(list=ls())
-
 library(lubridate)
 library(tidyverse)
 library(dplyr)
@@ -506,58 +504,5 @@ write.csv(quarter_count, "Data/quarter_count.csv", row.names = FALSE)
 #print(yearly_counts)
 # 2023 yearly_count matches the count of 1 for first_visit_2023
 
-### --- API Related Datasets ---------------------------------------------------
-source("API_Connection.R")
-
-# --- Filtering to Iowa Zip codes Only -------
-# Because of how the API is, post 2020 results does not let you pull by state
-# However, pre 2020 does.
-# FIX: Pull the zip codes from 2019 and filter so that each dataframe only include
-# the iowa zip codes
-zipcodes_2019 <- API_HHIncome_DataFrame %>% 
-  filter(year == 2019) %>% 
-  select(`zip code tabulation area`) %>%
-  distinct()  # Ensure unique ZIP codes
-
-# API_HHIncome_DataFrame <- API_HHIncome_DataFrame %>%
-#   filter(`zip code tabulation area` %in% zipcodes_2019$`zip code tabulation area`)
-# 
-# API_NumHH_DataFrame <- API_NumHH_DataFrame %>%
-#   filter(`zip code tabulation area` %in% zipcodes_2019$`zip code tabulation area`) 
-# 
-# API_SnapHH_DataFrame <- API_SnapHH_DataFrame %>%
-#   filter(`zip code tabulation area` %in% zipcodes_2019$`zip code tabulation area`)
-
-# --- Merging the columns -----------------
-API_data_5yr <- reduce(list(API_HHIncome_DataFrame, API_NumHH_DataFrame, API_SnapHH_DataFrame), 
-                   full_join, by = c("zip code tabulation area", 
-                                     "year", "state", "NAME")) 
-
-# --- Creating large dataset
-API_data_5yr <- API_data %>% rename(
-  Med_HHIncome = B19013_001E,
-  NumHH = B11016_001E,
-  SnapHH = B22003_001E,
-  zip_code = `zip code tabulation area`
-)
-# --- Filtering to Iowa Zip codes Only -------
-# Because of how the API is, post 2020 results does not let you pull by state
-# However, pre 2020 does.
-# FIX: Pull the zip codes from 2019 and filter so that each dataframe only include
-# the iowa zip codes
-zipcodes_2019 <- API_HHIncome_DataFrame %>% 
-  filter(year == 2019) %>% 
-  select(`zip code tabulation area`) %>%
-  distinct()  # Ensure unique ZIP codes
-API_data_5yr <- API_data_5yr %>% 
-  filter(zip_code %in% zipcodes_2019$`zip code tabulation area`) 
-
-# --- Creating Datasets for each individual year -------
-API_2020 <- API_data %>% filter(year==2020)
-API_2021 <- API_data %>% filter(year==2021)
-API_2022 <- API_data %>% filter(year==2022)
-API_2023 <- API_data %>% filter(year==2023)
-
-# Creating CSV's 
 
 
