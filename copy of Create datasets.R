@@ -59,10 +59,10 @@ monthly_count <- visit %>%
             num_PEOPLE_SNAP = sum(snap=="1"),
             num_threshhold=sum(threshhold=="1"),
             num_nosnap_threshhold=sum(threshhold=="1"&snap=="0")
-            ) %>% mutate(percent_snap=num_PEOPLE_SNAP/num_PEOPLE_SERVED*100,
-                         percent_nosnap_threshhold=num_nosnap_threshhold/num_threshhold*100,
-                         percent_threshhold=num_threshhold/num_PEOPLE_SERVED*100
-                         )
+  ) %>% mutate(percent_snap=num_PEOPLE_SNAP/num_PEOPLE_SERVED*100,
+               percent_nosnap_threshhold=num_nosnap_threshhold/num_threshhold*100,
+               percent_threshhold=num_threshhold/num_PEOPLE_SERVED*100
+  )
 
 quarter_count <- visit %>% 
   group_by(round_quarter) %>% 
@@ -76,7 +76,7 @@ quarter_count <- visit %>%
                percent_threshhold=num_threshhold/num_PEOPLE_SERVED*100
   )
 
-  
+
 #creating monthly frequency variable
 
 monthly_household_frequency <- visit %>% 
@@ -213,19 +213,19 @@ hh_data <- all %>%
     
     # Replace NA and negative values with the household median
     #annual_income = ifelse(is.na(annual_income) | annual_income < 0, household_income_median, annual_income)
-  #) %>%
-  #summarise(
+    #) %>%
+    #summarise(
     #n_people_in_household = length(unique(individual_id)),
     
-     #Household income by year  
-     income_2018 = first(annual_income[year(served_date) == 2018]),  
-     income_2019 = first(annual_income[year(served_date) == 2019]),  
-     income_2020 = first(annual_income[year(served_date) == 2020]),
-     income_2021 = first(annual_income[year(served_date) == 2021]),  
-     income_2022 = first(annual_income[year(served_date) == 2022]), 
-     income_2023 = first(annual_income[year(served_date) == 2023]),  
-     income_2024 = first(annual_income[year(served_date) == 2024]), 
-     #This was making some error for me, so I commented it out for now - Amelia
+    #Household income by year  
+    income_2018 = first(annual_income[year(served_date) == 2018]),  
+    income_2019 = first(annual_income[year(served_date) == 2019]),  
+    income_2020 = first(annual_income[year(served_date) == 2020]),
+    income_2021 = first(annual_income[year(served_date) == 2021]),  
+    income_2022 = first(annual_income[year(served_date) == 2022]), 
+    income_2023 = first(annual_income[year(served_date) == 2023]),  
+    income_2024 = first(annual_income[year(served_date) == 2024]), 
+    #This was making some error for me, so I commented it out for now - Amelia
     
     # Household income at first visit | Commented out because of redundancy | Same as income_first | From Grace 
     # income_first_visit = first(annual_income[served_date == first_visit]),
@@ -264,7 +264,7 @@ hh_data <- all %>%
     med_fed_poverty_level_2022 = median(fed_poverty_level[year(served_date) == 2022]), 
     med_fed_poverty_level_2023 = median(fed_poverty_level[year(served_date) == 2023]),  
     med_fed_poverty_level_2024 = median(fed_poverty_level[year(served_date) == 2024]), 
-  
+    
     # Household income at first visit  
     fed_poverty_level_first_visit = first(fed_poverty_level[served_date == first_visit]),
     
@@ -277,7 +277,7 @@ hh_data <- all %>%
     # Maximum and minimum recorded household income  
     fed_poverty_level_max = max(fed_poverty_level, na.rm = TRUE),  
     fed_poverty_level_min = min(fed_poverty_level, na.rm = TRUE),
-  
+    
     #housing information - homeless
     last_homeless_state=first(homeless[served_date == last_visit]), na.rm = TRUE,
     first_homeless_state=first(homeless[served_date == first_visit]), na.rm = TRUE,
@@ -327,7 +327,7 @@ hh_data <- all %>%
   )
 
 summary(hh_data)
-  
+
 # Clean hh_data ----------------------------------------------------------------
 
 # # Convert blank strings to NA
@@ -530,8 +530,8 @@ zipcodes_2019 <- API_HHIncome_DataFrame %>%
 
 # --- Merging the columns -----------------
 API_data_5yr <- reduce(list(API_HHIncome_DataFrame, API_NumHH_DataFrame, API_SnapHH_DataFrame), 
-                   full_join, by = c("zip code tabulation area", 
-                                     "year", "state", "NAME")) 
+                       full_join, by = c("zip code tabulation area", 
+                                         "year", "state", "NAME")) 
 
 # --- Creating large dataset
 API_data_5yr <- API_data %>% rename(
