@@ -1,10 +1,9 @@
+source("API_Connections/API_Connection.R")
 ### --- API Related Datasets ---------------------------------------------------
 library(lubridate)
 library(tidyverse)
 library(dplyr)
 library(purrr)
-
-source("API_Connections/API_Connection.R")
 
 # --- Merging the columns -----------------
 API_data <- reduce(list(API_HH_Results, API_SNAP_Results), 
