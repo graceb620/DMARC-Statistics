@@ -37,21 +37,43 @@ visit <- all %>%
   summarise( #ADD MORE HERE
     n_household = n(), #counts the number of rows within each afn, served_date
     zip = first(zip), #zip code per household during visit
-    first_visit = min(served_date) # First visit date
+    first_visit = min(served_date), # First visit date
+    snap = as.integer(any(snap_household == "Y", na.rm = TRUE)),
+    threshhold = as.integer(any(fed_poverty_level <= 160, na.rm = TRUE))
   ) %>% 
   mutate (
     served_year = year(served_date),
     served_month = month(served_date),
     served_day_of_month = mday(served_date),
-    round_month = round_date(served_date, "month")
+    round_month = round_date(served_date, "month"),
+    round_quarter = round_date(served_date, "quarter"),
   )
 
 # create a visit count dataset
 monthly_count <- visit %>% 
   group_by(round_month) %>% 
   summarise(num_VISITS = n(), #num rows (visits)
-            num_PEOPLE_SERVED = sum(n_household) # number of people that month
-            ) 
+            num_PEOPLE_SERVED = sum(n_household),# number of people that month
+            num_PEOPLE_SNAP = sum(snap=="1"),
+            num_threshhold=sum(threshhold=="1"),
+            num_nosnap_threshhold=sum(threshhold=="1"&snap=="0")
+            ) %>% mutate(percent_snap=num_PEOPLE_SNAP/num_PEOPLE_SERVED*100,
+                         percent_nosnap_threshhold=num_nosnap_threshhold/num_threshhold*100,
+                         percent_threshhold=num_threshhold/num_PEOPLE_SERVED*100
+                         )
+
+quarter_count <- visit %>% 
+  group_by(round_quarter) %>% 
+  summarise(num_VISITS = n(), #num rows (visits)
+            num_PEOPLE_SERVED = sum(n_household),# number of people that month
+            num_PEOPLE_SNAP = sum(snap=="1"),
+            num_threshhold=sum(threshhold=="1"),
+            num_nosnap_threshhold=sum(threshhold=="1"&snap=="0")
+  ) %>% mutate(percent_snap=num_PEOPLE_SNAP/num_PEOPLE_SERVED*100,
+               percent_nosnap_threshhold=num_nosnap_threshhold/num_threshhold*100,
+               percent_threshhold=num_threshhold/num_PEOPLE_SERVED*100
+  )
+
   
 #creating monthly frequency variable
 
@@ -113,6 +135,8 @@ hh_data <- all %>%
     first_visit_2023 = if_else(year(first_visit) == 2023, 1, 0),
     first_visit_2024 = if_else(year(first_visit) == 2024, 1, 0),
     
+    last_visit_2023 = if_else(year(last_visit) == 2023, 1, 0),
+    
     first_visit_zip = first(zip), # zip code during first visit
     
     # Snap related Variables
@@ -138,6 +162,9 @@ hh_data <- all %>%
     snap_first_2022 = as.integer(first_visit_2022 == 1 & snap_first_visit == 1),
     snap_first_2023 = as.integer(first_visit_2023 == 1 & snap_first_visit == 1),
     snap_first_2024 = as.integer(first_visit_2024 == 1 & snap_first_visit == 1),
+    
+    snap_last_visit = as.integer(first(snap_household[served_date == last_visit]) == "Y"),
+    snap_last_2023 = as.integer(last_visit_2023 == 1 & snap_last_visit == 1),
     
     # If they came off of SNAP at any point during a given year
     # snap_change_2018 = as.integer(year(served_date)==2018 & length(unique(snap_household)>1)), na.rm = TRUE,
@@ -350,7 +377,8 @@ hh_data <- hh_data %>%
 hh_first_visit_2023 <- hh_data %>%
   filter(year(first_visit) == 2023) %>%
   select(afn, n_people_in_household, first_visit, last_visit,
-         first_visit_zip, snap, snap_first_visit, snap_first_2023,
+         first_visit_zip, snap, snap_first_visit, snap_last_visit,
+         snap_first_2023,snap_last_2023,
          snap_change_2023, snap_proportion_2023,
          income_first, income_last, income_2023, income_avg, 
          income_max, income_min, household_income_median,
@@ -369,7 +397,7 @@ hh_23 <- hh_data %>%
   filter(year(last_visit) == 2023) %>%
   select(afn, n_people_in_household, first_visit, last_visit,
          first_visit_zip, snap, snap_first_visit, snap_first_2023,
-         snap_change_2023, snap_proportion_2023,
+         snap_change_2023, snap_proportion_2023,snap_last_2023,
          income_first, income_last, income_2023, income_avg, 
          income_max, income_min, household_income_median,
          fed_poverty_level_first, fed_poverty_level_2023,
@@ -462,7 +490,8 @@ write.csv(hh_first_visit_2022, "Data/hh_first22.csv", row.names = FALSE)
 write.csv(hh_22, "Data/hh_data22.csv", row.names = FALSE)
 write.csv(hh_first_visit_2021, "Data/hh_first21.csv", row.names = FALSE)
 write.csv(hh_21, "Data/hh_data21.csv", row.names = FALSE)
-
+write.csv(monthly_count, "Data/monthly_count.csv", row.names = FALSE)
+write.csv(quarter_count, "Data/quarter_count.csv", row.names = FALSE)
 
 # Verify that it only found 2023 first visits
 #hh_data %>%
