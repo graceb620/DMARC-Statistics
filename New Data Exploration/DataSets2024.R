@@ -32,14 +32,47 @@ visit2 <- all2 %>%
     first_visit = min(servedDate),
     service = first(service), 
     location = first(location), 
+    snap = as.integer(any(foodstamps == "Yes", na.rm = TRUE)),
+    threshold = as.integer(any(fedPovertyLevel <= 160, na.rm = TRUE)),
     .groups = "keep"
   ) %>% 
   mutate(
     year = year(servedDate),
     month = month(servedDate),
     day_of_month = mday(servedDate),
-    round_month = round_date(servedDate, "month")
+    round_month = round_date(servedDate, "month"),
+    round_quarter = round_date(servedDate, "quarter")
   )
+
+# --- Create a month and quarter level data set -----------------------------------------
+
+monthly_count2 <- visit2 %>% 
+  group_by(round_month) %>% 
+  summarise(num_VISITS = n(), #num rows (visits)
+            num_PEOPLE_SERVED = sum(hhMembers_visit),# number of people that month
+            num_PEOPLE_SNAP = sum(snap=="1"),
+            num_threshold=sum(threshold=="1"),
+            num_nosnap_threshold=sum(snap=="0"&threshold=="1")
+  ) %>% mutate(percent_snap=num_PEOPLE_SNAP/num_PEOPLE_SERVED*100,
+               percent_nosnap_threshold=num_nosnap_threshold/num_threshold*100,
+               percent_threshold=num_threshold/num_PEOPLE_SERVED*100
+  )
+
+quarter_count2 <- visit2 %>% 
+  group_by(round_quarter) %>% 
+  summarise(num_VISITS = n(), #num rows (visits)
+            num_PEOPLE_SERVED = sum(hhMembers_visit),# number of people that month
+            num_PEOPLE_SNAP = sum(snap=="1"),
+            num_threshold=sum(threshold=="1"),
+            num_nosnap_threshold=sum(snap=="0"&threshold=="1")
+  ) %>% mutate(percent_snap=num_PEOPLE_SNAP/num_PEOPLE_SERVED*100,
+               percent_nosnap_threshold=num_nosnap_threshold/num_threshold*100,
+               percent_threshold=num_threshold/num_PEOPLE_SERVED*100
+  )
+
+#during the dataset creation, they changed into character
+monthly_count2$round_month <- as.Date(monthly_count2$round_month) # I have no clue why round_quarter is a character 
+quarter_count2$round_quarter <- as.Date(quarter_count2$round_quarter) # I have no clue why round_quarter is a character 
 
 
 ### --- Create an Individual Level Dataset -------------------------------------
@@ -91,14 +124,15 @@ hh2_2024 <- hh_data2 %>%
   select(householdMembers, visit_count_2024, IncomeSource, fedPovertyLevel,
          annualIncome, foodstamps, primary_visit_location, primary_service,
          primary_visitor_occupation, dietary_issue, veteran)
-  
+
   
 ### --- Create CSV's -----------------------------------------------------------
 write.csv(hh_data2, "Data/hh_data2.csv", row.names = FALSE)
 write.csv(individuals, "Data/individual.csv", row.names=FALSE)
 write.csv(visit2, "Data/visit2.csv", row.names=FALSE)
-write.csv(hh2_2024, "Data/hh2_2024", row.names=FALSE)
-
+write.csv(hh2_2024, "Data/hh2_2024.csv", row.names=FALSE)
+write.csv(monthly_count2, "Data/monthly_count2.csv", row.names = FALSE)
+write.csv(quarter_count2, "Data/quarter_count2.csv", row.names = FALSE)
 
 
 

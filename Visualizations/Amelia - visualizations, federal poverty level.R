@@ -7,13 +7,15 @@ library(tidyverse)
 rm(list=ls())
 
 hh_data_2023<-read.csv('Data/hh_data23.csv', stringsAsFactors=FALSE)
-monthly_count<-read.csv('Data/monthly_count.csv', stringsAsFactors=FALSE)
-quarter_count <- read.csv('Data/quarter_count.csv', stringsAsFactors=FALSE)
+monthly_count<-read.csv('Data/monthly_count2.csv', stringsAsFactors=FALSE)
+quarter_count <- read.csv('Data/quarter_count2.csv', stringsAsFactors=FALSE)
 
-monthly_count<-monthly_count%>%filter(year(round_month)==2023)
-quarter_count<-quarter_count%>%filter(year(round_quarter)>2019&year(round_quarter)<2024)
+monthly_count<-monthly_count%>%filter(year(round_month)>=2020&year(round_month)<2025)
+quarter_count<-quarter_count%>%filter(year(round_quarter)>=2020&year(round_quarter)<2025)
+monthly_count$round_month <- as.Date(monthly_count$round_month) # I have no clue why round_quarter is a character 
+quarter_count$round_quarter <- as.Date(quarter_count$round_quarter) # I have no clue why round_quarter is a character 
 
-summary(hh_data_2023)
+summary(quarter_count)
 #
 # # median income of households------
 # ggplot(hh_data_2023, aes(x = first_visit_2023, y = household_income_median, group=first_visit_2023)) + 
@@ -129,75 +131,22 @@ ggplot(hh_data_2023, aes(x = poverty_cat, fill = snap_last_2023)) +
   scale_y_continuous(breaks = seq(0, max(table(hh_data_2023$poverty_cat)), by = 1000)) +
   scale_fill_brewer(palette = "Spectral") 
 
-# graphs for over-time under threshhold but no snap -------
-ggplot(quarter_count, aes(x = round_quarter, y=num_nosnap_threshhold)) +
-  geom_col() +
-  labs(title = "Visitors that might qualify but do not take out SNAP benefits",
-       subtitle="using the maximum threshhold of 160% poverty level",
-       x = "Quarters",
-       y = "Count")+
-  theme_minimal()
-par(new=TRUE)
-ggplot(quarter_count, aes(x = round_quarter, y=num_PEOPLE_SERVED)) +
-  geom_col(color="blue") 
-
+# graphs for over-time under threshold but no snap -------
+scale_factor <- max(quarter_count$num_nosnap_threshold, na.rm = TRUE) / 
+  max(quarter_count$percent_nosnap_threshold, na.rm = TRUE)
 
 ggplot(quarter_count, aes(x = round_quarter)) +
-  geom_col(aes(y = num_nosnap_threshhold), fill = "grey", alpha = 0.7,position = "dodge") +
-  geom_col(aes(y = num_PEOPLE_SERVED), fill = "blue", alpha = 0.4,position = "dodge") +
-  labs(title = "Visitors that might qualify but do not take out SNAP benefits",
-       subtitle = "Using the maximum threshold of 160% poverty level",
-       x = "Quarters",
-       y = "Count") +
-  theme_minimal()
-
-scale_factor <- max(quarter_count$percentage_threshhold, na.rm = TRUE)
-
-ggplot(quarter_count, aes(x = round_quarter)) +
-  geom_col(aes(y = num_nosnap_threshhold), 
-           position = "dodge") +
-  geom_line(aes(y = percentage_threshhold), 
-            size = 1.2, group = 1) +
-  scale_y_continuous(
-    name = "Count of people not taking snap",
-    sec.axis = sec_axis(range(0,scale_factor),name = "Percentage")
-  ) +
-  labs(title = "Visitors that might qualify but do not take out SNAP benefits",
-       subtitle = "Using the maximum threshold of 160% poverty level",
-       x = "Quarters",
-       y = "Count")
-  theme_minimal()
-  
-scale_factor <- max(quarter_count$num_nosnap_threshhold, na.rm = TRUE) / 
-                max(quarter_count$percentage_threshhold, na.rm = TRUE)
-
-ggplot(quarter_count, aes(x = round_quarter)) +
-  geom_col(aes(y = num_nosnap_threshhold), 
-           position = "dodge", fill = "gray") +
-  geom_line(aes(y = percentage_threshhold * scale_factor), 
-            size = 1.2, group = 1, color = "blue") +
-  scale_y_continuous(
-    name = "Count of people not taking SNAP",
-    sec.axis = sec_axis(~./scale_factor, name = "Percentage")
-  ) +
-  labs(title = "Visitors that might qualify but do not take out SNAP benefits",
-       subtitle = "Using the maximum threshold of 160% poverty level",
-       x = "Quarters",
-       y = "Count") +
-  theme_minimal()
-
-
-scale_factor <- max(quarter_count$num_nosnap_threshhold, na.rm = TRUE) / 
-  max(quarter_count$percent_nosnap_threshhold, na.rm = TRUE)
-
-ggplot(quarter_count, aes(x = round_quarter)) +
-  geom_col(aes(y = num_nosnap_threshhold, fill = "Count" )) +
-  geom_line(aes(y = percent_nosnap_threshhold * scale_factor, color = "Percentage \nout of all income eligible visitors"), size = 1.2, group = 1) +
+  geom_col(aes(y = num_nosnap_threshold, fill = "Count" )) +
+  geom_line(aes(y = percent_nosnap_threshold * scale_factor, color = "Percentage \nout of all income eligible visitors"), size = 1.2, group = 1) +
   scale_y_continuous(
     name = "Count",
     sec.axis = sec_axis(~./scale_factor, name = "Percentage (in %) ")
+  ) + 
+  scale_x_date(
+    date_breaks = "1 year",
+    date_labels = "%Y"
   ) +
-  labs(title = "Visitors that are income eligible but do not take out SNAP benefits",
+  labs(title = "Income eligible visitors that do NOT take out foodstamps (SNAP)",
        subtitle = "using the maximum threshold of 160% federal poverty level",
        x = "Quarters",
        y = "Count",
