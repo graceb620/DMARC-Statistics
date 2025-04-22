@@ -31,7 +31,7 @@ visit2 <- all2 %>%
     hhMembers_visit = n(), 
     first_visit = min(servedDate),
     service = first(service), 
-    location = first(location), 
+    location = first(location),
     snap = as.integer(any(foodstamps == "Yes", na.rm = TRUE)),
     threshold = as.integer(any(fedPovertyLevel <= 160, na.rm = TRUE)),
     .groups = "keep"
@@ -40,7 +40,7 @@ visit2 <- all2 %>%
     year = year(servedDate),
     month = month(servedDate),
     day_of_month = mday(servedDate),
-    round_month = round_date(servedDate, "month"),
+    round_month = round_date(servedDate, "month").
     round_quarter = round_date(servedDate, "quarter")
   )
 
@@ -72,8 +72,7 @@ quarter_count2 <- visit2 %>%
 
 #during the dataset creation, they changed into character
 monthly_count2$round_month <- as.Date(monthly_count2$round_month) # I have no clue why round_quarter is a character 
-quarter_count2$round_quarter <- as.Date(quarter_count2$round_quarter) # I have no clue why round_quarter is a character 
-
+quarter_count2$round_quarter <- as.Date(quarter_count2$round_quarter) # I have no clue why round_quarter is a character
 
 ### --- Create an Individual Level Dataset -------------------------------------
 individuals <- all2 %>% 
@@ -94,7 +93,6 @@ individuals <- all2 %>%
 hh_data2 <- all2 %>% 
   group_by(houseHoldIdAfn) %>% 
   summarize(
-    
     householdMembers = max(householdMembers), #Number of people in household
     
     first_visit = min(servedDate),
@@ -124,7 +122,6 @@ hh2_2024 <- hh_data2 %>%
   select(householdMembers, visit_count_2024, IncomeSource, fedPovertyLevel,
          annualIncome, foodstamps, primary_visit_location, primary_service,
          primary_visitor_occupation, dietary_issue, veteran)
-
   
 ### --- Create CSV's -----------------------------------------------------------
 write.csv(hh_data2, "Data/hh_data2.csv", row.names = FALSE)
@@ -133,6 +130,8 @@ write.csv(visit2, "Data/visit2.csv", row.names=FALSE)
 write.csv(hh2_2024, "Data/hh2_2024.csv", row.names=FALSE)
 write.csv(monthly_count2, "Data/monthly_count2.csv", row.names = FALSE)
 write.csv(quarter_count2, "Data/quarter_count2.csv", row.names = FALSE)
+write.csv(hh2_2024, "Data/hh2_2024", row.names=FALSE)
+
 
 
 

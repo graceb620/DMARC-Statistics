@@ -153,19 +153,20 @@ finalforest <- randomForest(as.factor(first_visit_2024) ~ householdMembers + Inc
                             mtry = 4)
 
 pi_hat <- predict(finalforest, test.df, type="prob")[,"1"]
+
 forest_rocCurve <- roc(response=test.df$first_visit_2024,
                        predictor=pi_hat,
                        levels=c("0","1"))
 
-### --- ROC Curves -------------------------------------------------------------\
+### --- ROC Curves -------------------------------------------------------------
 par(mfrow=c(2,2))
 plot(ridge_rocCurve, main="ROC Curve for Ridge Model",print.thres = TRUE, print.auc = TRUE)
 plot(lasso_rocCurve, main="ROC curve for Lasso Model", print.thres = TRUE, print.auc = TRUE)
 plot(forest_rocCurve, main="ROC Curve for Random Forest Model", print.thres=TRUE, print.auc=TRUE)
-
 ### --- Making a variable Importance Plot -------------------------------------
 par(mfrow=c(1,1))
-varImpPlot(finalforest, type=2)
+varImpPlot(finalforest, type=2, main="Variable Importance Plot for 
+           if a person is a first time visitor in 2024")
 
 
 
