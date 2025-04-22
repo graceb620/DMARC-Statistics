@@ -91,6 +91,68 @@ ggplot(hh_data_summary_single_parent_returners, aes(x = visit_year, y = percent,
 
 # Used ChatGPT to help with formatting.
 
+# Additional Visualizations
+
+# Most common housing areas:
+
+top_zips <- visit %>%
+  count(zip, sort = TRUE) %>%
+  top_n(10, wt = n)
+
+ggplot(top_zips, aes(x = reorder(zip, n), y = n)) +
+  geom_col(fill = "#3498DB") +
+  coord_flip() +
+  labs(
+    title = "Top 10 Zip Codes of Households Served",
+    x = "Zip Code",
+    y = "Number of Visits"
+  ) +
+  theme_minimal()
+
+# Distribution of Household Sizes
+ggplot(hh_data, aes(x = n_people_in_household)) +
+  geom_histogram(binwidth = 1, fill = "#F39C12", color = "white") +
+  labs(
+    title = "Distribution of Household Sizes",
+    x = "Number of People in Household",
+    y = "Count of Households"
+  ) +
+  theme_minimal()
+
+visit %>%
+  count(housing_status, sort = TRUE) %>%
+  ggplot(aes(x = reorder(housing_status, n), y = n)) +
+  geom_col(fill = "#1ABC9C") +
+  coord_flip() +
+  labs(
+    title = "Visit Counts by Housing Status",
+    x = "Housing Status",
+    y = "Number of Visits"
+  ) +
+  theme_minimal()
+
+hh_data <- hh_data %>%
+  mutate(metro_status = if_else(first_visit_zip %in% c("50311", "50310", "50312"), "Metro", "Non-Metro"))
+
+# Summarize household counts over years by metro status
+hh_trends <- hh_data %>%
+  mutate(metro_status = if_else(first_visit_zip %in% c("50311", "50310", "50312"), "Metro", "Non-Metro")) %>%
+  filter(between(year(first_visit), 2020, 2023)) %>%
+  mutate(visit_year = year(first_visit)) %>%
+  group_by(visit_year, metro_status) %>%
+  summarise(hh_count = n()) %>%
+  ungroup()
+
+# Create a bar chart of household count over years by metro status
+ggplot(hh_trends, aes(x = factor(visit_year), y = hh_count, fill = metro_status)) +
+  geom_bar(stat = "identity", position = "dodge") +  # Bar chart with dodged bars
+  labs(title = "Household Count Over Time by Metro Status",
+       x = "Year",
+       y = "Number of Households",
+       fill = "Metro Status") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for readability
+
 
 
 
