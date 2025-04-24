@@ -154,6 +154,24 @@ ggplot(hh_trends, aes(x = factor(visit_year), y = hh_count, fill = metro_status)
   theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for readability
 
 
+# Look at pantry loactions
+# Top 10 most used locations (pantries)
+top_10_locations <- all %>%
+  count(location, name = "count") %>%
+  arrange(desc(count)) %>%
+  slice_head(n = 10)
+
+# Plot it
+ggplot(top_10_locations, aes(x = reorder(location, count), y = count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(title = "Top 10 Most Used Pantries",
+       x = "Location",
+       y = "Number of Records") +
+  scale_y_continuous(labels = scales::comma) +  # Formats y-axis with commas
+  coord_flip() +  # Horizontal bar chart for better readability
+  theme_minimal()
+
+
 
 
 
