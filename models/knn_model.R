@@ -10,6 +10,7 @@ library(ggplot2)
 library(tidyverse)
 library(class)  
 library(caret)  
+library(tibble)
 
 # Load dataset
 hh_23 <- read.csv('Data/hh_data23.csv', stringsAsFactors=FALSE)
@@ -81,3 +82,24 @@ ggplot(accuracy_results, aes(x = k, y = accuracy)) +
   ggtitle("KNN Accuracy for Different k Values") +
   xlab("k") + ylab("Accuracy")
 
+
+
+###########trying to analyze the model###########
+Y_train_numeric <- as.numeric(Y_train) 
+# Compute the correlation for each feature in X_train with the numeric target Y_train_numeric
+cor_target <- cor(X_train, Y_train_numeric, use = "complete.obs")
+
+# Convert correlation results into a data frame
+cor_target_df <- as.data.frame(cor_target) %>%
+  rownames_to_column("Variable") %>%
+  filter(!is.na(cor_target)) %>%  # Keep only non-NA correlations
+  mutate(abs_corr = abs(cor_target)) %>%  # Compute absolute correlation values
+  arrange(desc(abs_corr))  # Sort by absolute correlation
+
+# plotting the correlation values
+ggplot(cor_target_df, aes(x = reorder(Variable, -abs_corr), y = abs_corr)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Correlation with First-Time Visit (2023)",
+       x = "Variable", y = "Absolute Correlation") +
+  theme_minimal()
