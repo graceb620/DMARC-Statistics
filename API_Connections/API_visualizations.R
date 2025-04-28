@@ -2,8 +2,5 @@
 API_data <- read.csv("data/API_data.csv")
 API_2024 <- read.csv("data/API_2023.csv")
 
-# Narrow the entries to only zipcodes that are included in original dataset. 
-API_data <- API_data %>% 
-  filter(zip_code %in% zip_codes$zip)
-
 # --- Creating the visualization -----------------------------------------------
+# I want to create a visualization of the 

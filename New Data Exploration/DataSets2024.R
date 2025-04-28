@@ -10,7 +10,9 @@ colnames(newData)
 all2 <- newData %>% 
   mutate(
     servedDate = ymd_hms(servedDate), #converts to desired date format
-    servedDate = as_date(servedDate) #only grabs date
+    servedDate = as_date(servedDate), #only grabs date
+    dob=ymd(dob),
+    age=year(Sys.Date())-year(dob)
   )
 
 summary(all2) # Checking to make sure that all of the columns are in the desired

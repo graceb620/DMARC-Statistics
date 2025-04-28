@@ -504,5 +504,8 @@ write.csv(quarter_count, "Data/quarter_count.csv", row.names = FALSE)
 #print(yearly_counts)
 # 2023 yearly_count matches the count of 1 for first_visit_2023
 
+### PUlling zipcodes out
+zip_codes <- all %>%
+  distinct(zip)
 
 
