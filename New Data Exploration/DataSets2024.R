@@ -84,6 +84,7 @@ quarter_count2$round_quarter <- as.Date(quarter_count2$round_quarter) # I have n
 individuals <- all2 %>% 
   group_by(clientId) %>% 
   summarize(
+    first_visit_year = first(year(servedDate)),
     afn = first(houseHoldIdAfn),
     gender = first(gender),
     race = first(race),
