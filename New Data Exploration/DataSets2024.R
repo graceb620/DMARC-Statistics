@@ -160,14 +160,15 @@ hh_summary_2024 <- all2 %>%
     foodstamps = as.integer(any(foodstamps == "Yes")),
     
     primary_visit_location = names(which.max(table(location))),
+    visit_location_change = as.integer(n_distinct(location) > 1),
     primary_service = names(which.max(table(service))),
     primary_visitor_occupation = names(which.max(table(category))),
     
     dietary_issue = as.integer(any(!dietaryIssue %in% c("None", "Unknown"))),
     
     anyveteran = as.integer(any(veteran == "Yes", na.rm = TRUE)),
-    anycollege = as.integer(any(education=="College",  na.rm = TRUE)),
-    anyschoolkid = as.integer(any(education=="Currently",  na.rm = TRUE))
+    anycollege = as.integer(any(grepl("College", education))),
+    anyschoolchild = as.integer(any(grepl("Currently", education))),
   ) %>% ungroup()
 
 # Merge both
