@@ -125,6 +125,8 @@ hh_data <- all %>%
     
     n_people_in_household = n_distinct(individual_id),
     
+    loc=location,
+    
     first_visit = min(served_date),
     last_visit = max(served_date), 
     first_visit_2018 = if_else(year(first_visit) == 2018, 1, 0),
@@ -406,7 +408,7 @@ hh_23 <- hh_data %>%
          med_fed_poverty_level_2023,
          first_homeless_state, last_homeless_state, 
          first_housing_type, last_housing_type, own_or_buying,
-         one_change_location, more_than_one_change_location,
+         one_change_location, more_than_one_change_location, loc,
          elderly, child, working_age, college_education, 
          highest_education, kids, single_parent, first_visit_2023)
 
