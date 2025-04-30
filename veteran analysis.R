@@ -93,11 +93,26 @@ rocCurve<-roc(response=test.df$anyveteran,
 plot(rocCurve,print.thres=TRUE,print.auc=TRUE)
 
 #If we set pi* to 0.147 
-#(we predict a luxury house if the probability of it being luxury is 0.14)
+#(we predict that a visitor is a veteran household if the probability of it being luxury is 0.14)
 #Our specificity is 0.959
 #Our sensitivity is 0.89
-#We'll predict that a house is standard 95.9% of the time when it is actually standard
-#We'll predict that a house is luxury 89% of the time when it is actually 
+#We'll predict that a visitor is a veteran household 62.6% of the time when it is actually veteran
+#We'll predict that a visitor is not a veteran household 71% of the time when it actually is 
+
+
+# Variable Importance Plot ---------
+par(mfrow=c(1,1))
+varImpPlot(finalforest, type=1)
+vi <- as.data.frame(varImpPlot(finalforest, type=1))
+vi$Variable <- rownames(vi)
+
+ggplot(data = vi) +
+  geom_bar(aes(x=reorder(Variable,MeanDecreaseAccuracy),
+               weight=MeanDecreaseAccuracy), position="identity") +
+  coord_flip() + 
+  labs(x="Variable Name", y="Mean Decrease Accuracy") + 
+  ggtitle("Variable Importance Plot for Veteran Housholds")
+
 
 # Veteran only visualizations -----------------
 # Creating veteran only data set for visualizations
