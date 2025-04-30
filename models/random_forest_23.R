@@ -92,6 +92,7 @@ ggplot(importance_data, aes(x = reorder(Factors, Importance), y = Importance)) +
   labs(title = "Factor Importance in Predicting First Visit in 2023", x = "Factor", y = "Importance (Mean Decrease in Accuracy)") +
   theme_minimal()
 
+
 # THIS IS SOME BS
 
 # Partial Dependence Plots to further understand relationships
