@@ -92,15 +92,6 @@ ggplot(importance_data, aes(x = reorder(Factors, Importance), y = Importance)) +
   labs(title = "Factor Importance in Predicting First Visit in 2023", x = "Factor", y = "Importance (Mean Decrease in Accuracy)") +
   theme_minimal()
 
-#Goal: Show how common it is for households to visit multiple pantry locations and whether that behavior changed over time.
-hh_23 %>%
-  mutate(more_than_one_location = as.integer(n_distinct(location) > 1)) %>%
-  ggplot(aes(factor(more_than_one_location))) +
-  geom_bar(fill = "steelblue") +
-  labs(x = "Visited More Than One Location", y = "Number of Households",
-       title = "Households Visiting More Than One Pantry Location")
-
-
 
 # THIS IS SOME BS
 

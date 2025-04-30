@@ -131,28 +131,47 @@ visit %>%
   ) +
   theme_minimal()
 
-hh_data <- hh_data %>%
-  mutate(metro_status = if_else(first_visit_zip %in% c("50311", "50310", "50312"), "Metro", "Non-Metro"))
-
-# Summarize household counts over years by metro status
-hh_trends <- hh_data %>%
-  mutate(metro_status = if_else(first_visit_zip %in% c("50311", "50310", "50312"), "Metro", "Non-Metro")) %>%
-  filter(between(year(first_visit), 2020, 2023)) %>%
-  mutate(visit_year = year(first_visit)) %>%
-  group_by(visit_year, metro_status) %>%
-  summarise(hh_count = n()) %>%
-  ungroup()
-
-# Create a bar chart of household count over years by metro status
-ggplot(hh_trends, aes(x = factor(visit_year), y = hh_count, fill = metro_status)) +
-  geom_bar(stat = "identity", position = "dodge") +  # Bar chart with dodged bars
-  labs(title = "Household Count Over Time by Metro Status",
-       x = "Year",
+#Goal: Show how common it is for households to visit multiple pantry locations and whether that behavior changed over time.
+all %>%
+  semi_join(hh_23, by = "afn") %>%
+  group_by(afn) %>%
+  summarise(more_than_one_location = as.integer(n_distinct(location) > 1)) %>%
+  ggplot(aes(factor(more_than_one_location))) +
+  geom_bar(fill = "steelblue") +
+  labs(x = "Visited More Than One Location", 
        y = "Number of Households",
-       fill = "Metro Status") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for readability
+       title = "Households Visiting More Than One Pantry Location")
 
+# Summarize: Did a household visit more than one location, and in what year?
+multi_location_by_year <- all %>%
+  semi_join(hh_23, by = "afn") %>%
+  group_by(afn) %>%
+  summarise(
+    more_than_one_location = as.integer(n_distinct(location) > 1),
+    first_visit_year = year(min(date))
+  ) %>%
+  filter(first_visit_year > 2019 & first_visit_year < 2024) %>%
+  count(first_visit_year, more_than_one_location) %>%
+  group_by(first_visit_year) %>%
+  mutate(percent = (n / sum(n)) * 100)
+
+# Plot: Percent of households visiting more than one location per year
+ggplot(multi_location_by_year, aes(x = factor(first_visit_year), y = percent, 
+                                   fill = factor(more_than_one_location, levels = c(0, 1), 
+                                                 labels = c("No", "Yes")))) +
+  geom_bar(stat = "identity", position = "stack", color = "black") +
+  scale_fill_manual(values = c("Yes" = "#E69F00", "No" = "#56B4E9")) +
+  geom_text(aes(label = round(percent, 1)), 
+            position = position_stack(vjust = 0.5), color = "white", fontface = "bold", size = 3) +
+  labs(
+    title = "Proportion of Households Visiting More Than One Pantry Location",
+    subtitle = "Grouped by Year of First Visit",
+    x = "First Visit Year",
+    y = "Percentage of Households",
+    fill = "Visited >1 Location"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Look at pantry loactions
 # Top 10 most used locations (pantries)
