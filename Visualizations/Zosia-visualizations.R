@@ -1,5 +1,6 @@
 rm(list=ls()) 
 source("Create_datasets.R") 
+source("DataSets2024.R") 
 library(ggplot2)
 library(reshape2)
 library(RColorBrewer)
@@ -99,15 +100,17 @@ top_zips <- visit %>%
   count(zip, sort = TRUE) %>%
   top_n(10, wt = n)
 
-ggplot(top_zips, aes(x = reorder(zip, n), y = n)) +
-  geom_col(fill = "#3498DB") +
-  coord_flip() +
-  labs(
-    title = "Top 10 Zip Codes of Households Served",
-    x = "Zip Code",
-    y = "Number of Visits"
-  ) +
-  theme_minimal()
+
+# ggplot(top_zips, aes(x = reorder(zip, n), y = n)) +
+#   geom_col(fill = "#3498DB") +
+#   coord_flip() +
+#   labs(
+#     title = "Top 10 Zip Codes of Households Served",
+#     x = "Zip Code",
+#     y = "Number of Visits"
+#   ) +
+#   theme_minimal()
+
 
 # Distribution of Household Sizes
 ggplot(hh_data, aes(x = n_people_in_household)) +
@@ -119,17 +122,6 @@ ggplot(hh_data, aes(x = n_people_in_household)) +
   ) +
   theme_minimal()
 
-visit %>%
-  count(housing_status, sort = TRUE) %>%
-  ggplot(aes(x = reorder(housing_status, n), y = n)) +
-  geom_col(fill = "#1ABC9C") +
-  coord_flip() +
-  labs(
-    title = "Visit Counts by Housing Status",
-    x = "Housing Status",
-    y = "Number of Visits"
-  ) +
-  theme_minimal()
 
 #Goal: Show how common it is for households to visit multiple pantry locations and whether that behavior changed over time.
 all %>%
@@ -279,6 +271,39 @@ ggplot(top_10_locations, aes(x = reorder(location, count), y = count)) +
        y = "Number of Records") +
   scale_y_continuous(labels = scales::comma) +  # Formats y-axis with commas
   coord_flip() +  # Horizontal bar chart for better readability
+  theme_minimal()
+
+
+
+
+
+
+hh_data24 <- read.csv("Data/amelia_hh2_2024.csv")
+#Goal: Show how common it is for households to visit multiple pantry locations in 2024.
+# Cleaned and labeled data for plotting
+multi_location_by_child <- hh_data24 %>%
+  mutate(
+    visited_multiple_locations = ifelse(visit_location_change == 1, "Multiple Locations", "One Location"),
+    has_child = ifelse(anyschoolchild == 1, "Has Child", "No Child")
+  ) %>%
+  count(has_child, visited_multiple_locations) %>%
+  group_by(has_child) %>%
+  mutate(percent = n / sum(n) * 100)
+
+# Plot
+ggplot(multi_location_by_child,
+       aes(x = visited_multiple_locations, y = percent, fill = has_child)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = paste0(round(percent, 1), "%")),
+            position = position_dodge(width = 0.9),
+            vjust = -0.3, size = 3) +
+  scale_fill_manual(values = c("Has Child" = "#E69F00", "No Child" = "#56B4E9")) +
+  labs(
+    title = "Households Visiting Multiple Pantry Locations in 2024",
+    x = "Pantry Visit Pattern",
+    y = "Percentage of Households",
+    fill = "Household Has School-Age Child"
+  ) +
   theme_minimal()
 
 
