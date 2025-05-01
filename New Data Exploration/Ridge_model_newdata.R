@@ -168,8 +168,22 @@ par(mfrow=c(1,1))
 varImpPlot(finalforest, type=2, main="Variable Importance Plot for 
            if a person is a first time visitor in 2024")
 
+### --- Interpretations on variables ------------------------------------------
+# I will be using the ridge model for my interpretations because it has the best
+# AUC. 
+coef(ridge)
 
+# Fed Poverty Level
+exp(-10*-0.002303604)
+# For every 10% 1.023303 in household federal poverty level the odds of a household
+# being a first time visitor in 2024 increase by a factor of 1.02. This means that 
+# the probability of a household being a first time visitor in 2024 increases by 
+# roughly 2% for every 10% under the federal poverty level they are. 
 
+# Food Stamps
+exp(-1.801642118)
+# The odds of a household being a first time visitor decrease by a factor of 0.165
+# for a household that has had food stamps vs a household that has not had foodstamps.
 
 
 

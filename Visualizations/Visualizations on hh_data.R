@@ -61,5 +61,3 @@ hh_data %>%
        x = "Year",
        y = "Number of Households") +
   theme_minimal()
-
-##
