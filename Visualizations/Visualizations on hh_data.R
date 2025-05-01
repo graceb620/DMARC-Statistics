@@ -1,5 +1,6 @@
 library(ggplot2)
 library(dplyr)
+library(lubridate)
 
 hh_data_2023<-read.csv('Data/hh_data23.csv', stringsAsFactors=FALSE)
 hh_data <- read.csv('Data/hh_data.csv', stringsAsFactors = FALSE)
@@ -14,7 +15,6 @@ ggplot(hh_data, aes(x = first_visit)) +
        y = "Density") 
 
 ##Graph of Family types and their homeless status
-
 
 hh_data_2023 %>%
   count(homeless) %>%
@@ -53,11 +53,35 @@ hh_data %>%
 
 ## If the hh was on snap during the first visit
 hh_data %>%
-  group_by(year = year()) %>%
-  summarize(count = sum(snap_first_visit, na.rm = TRUE)) %>%
-  ggplot(aes(x = factor(year), y = count)) +  # Convert year to factor for proper labeling
-  geom_col(fill = "steelblue") +
-  labs(title = "Number of Households on SNAP During their First Visit per Year",
-       x = "Year",
-       y = "Number of Households") +
-  theme_minimal()
+  mutate(
+    year = year(first_visit),
+    snap_status = ifelse(snap_first_visit == 1, "SNAP", "Non-SNAP")
+  ) %>%
+  filter(!year %in% c(2018, 2019, 2024)) %>%
+  group_by(year, snap_status) %>%
+  summarize(total = n(), .groups = "drop") %>%
+  group_by(year) %>%
+  mutate(
+    proportion = total / sum(total),
+    label_text = paste0(total, "\n(", scales::percent(proportion, accuracy = 1), ")")
+  ) %>%
+  ggplot(aes(x = factor(year), y = total, fill = snap_status)) +
+  geom_col(color = "black") +
+  scale_fill_manual(
+    values = c("SNAP" = "#D55E00", "Non-SNAP" = "#0072B2")
+  ) +
+  geom_text(
+    aes(label = label_text),
+    position = position_stack(vjust = 0.5),
+    color = "white", fontface = "bold", size = 4
+  ) +
+  labs(
+    title = "First Time Household Visits to DMARC by Year",
+    subtitle = "Focused on if they were receiving SNAP benefits during the first visit",
+    x = "Year",
+    y = "Total Households",
+    fill = "Household Type"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "right")
+

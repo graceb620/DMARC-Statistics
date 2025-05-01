@@ -507,5 +507,5 @@ write.csv(quarter_count, "Data/quarter_count.csv", row.names = FALSE)
 ### PUlling zipcodes out
 zip_codes <- all %>%
   distinct(zip)
-
+write.csv(zip_codes, "Data/zip_codes.csv")
 

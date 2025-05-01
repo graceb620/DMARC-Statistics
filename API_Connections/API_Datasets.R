@@ -33,16 +33,10 @@ API_data <- API_data %>%
   filter(zip_code %in% zipcodes_2019$`zip code tabulation area`) 
 
 # --- Creating Datasets for each individual year -------
-API_2020 <- API_data %>% filter(year==2020)
-API_2021 <- API_data %>% filter(year==2021)
-API_2022 <- API_data %>% filter(year==2022)
 API_2023 <- API_data %>% filter(year==2023)
+
 
 # Creating CSV's 
 write.csv(API_data, "Data/API_data.csv", row.names = FALSE)
-write.csv(API_2020, "Data/API_2020.csv", row.names = FALSE)
-write.csv(API_2021, "Data/API_2021.csv", row.names = FALSE)
-write.csv(API_2022, "Data/API_2022.csv", row.names = FALSE)
 write.csv(API_2023, "Data/API_2023.csv", row.names = FALSE)
 
-API_da
