@@ -66,7 +66,8 @@ prob_tuned <- predict(rforest_tuned, test.df, type = "prob")
 roc_curve <- roc(test.df$first_visit_2023, prob_tuned[, 2], levels = rev(levels(test.df$first_visit_2023)))
 
 # Plot ROC Curve
-plot(roc_curve, col = "blue", main = "ROC Curve for Tuned Random Forest Model")
+plot(roc_curve, col = "blue", main = "ROC Curve for Tuned Random Forest Model", print.auc = TRUE, 
+     legacy.axes = TRUE)
 abline(a = 0, b = 1, lty = 2, col = "red")
 
 # Print AUC
@@ -76,6 +77,13 @@ cat("AUC:", auc_value, "\n")
 # Extract and Compare Accuracy
 accuracy_tuned <- conf_matrix_tuned$overall["Accuracy"]
 cat("Tuned Model Accuracy:", accuracy_tuned, "\n")
+
+# Extract sensitivity and specificity
+sensitivity <- conf_matrix_tuned$byClass["Sensitivity"]
+specificity <- conf_matrix_tuned$byClass["Specificity"]
+# Print them
+cat("Sensitivity:", round(sensitivity, 3), "\n")
+cat("Specificity:", round(specificity, 3), "\n")
 
 # The improvement is noticeable, though not huge, which suggests the original model was already well-configured
 
