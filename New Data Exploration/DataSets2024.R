@@ -149,8 +149,8 @@ hh_summary_2024 <- all2 %>%
   summarize(
     visit_count_2024 = n_distinct(servedDate),
     
-    meantimeemployed = mean(incomeSource == "Employed", na.rm = TRUE),
-    unstableemployement24 = if_else(meantimeemployed<1,1,0),
+    meanpeopletimeemployed = mean(incomeSource == "Employed", na.rm = TRUE),
+    unstableemployement24 = if_else(meanpeopletimeemployed<1,1,0),
     #if there is not at least one employed person at all times, then meantime will be less than one
     
     medfedPovertyLevel = median(fedPovertyLevel),
@@ -163,12 +163,20 @@ hh_summary_2024 <- all2 %>%
     primary_visit_location = names(which.max(table(location))),
     visit_location_change = as.integer(n_distinct(location) > 1),
     primary_service = names(which.max(table(service))),
-    primary_visitor_occupation = names(which.max(table(category))),
+    primary_visitor_occupation = {
+      valid_locs <- category[!grepl("Currently", education)]
+      if (length(valid_locs) > 0) {
+        names(which.max(table(valid_locs)))
+      } else {
+        NA_character_
+      }
+    }, #this prevents kids from being counted for occupation
     
     dietary_issue = as.integer(any(!dietaryIssue %in% c("None", "Unknown"))),
     
     anyveteran = as.integer(any(veteran == "Yes", na.rm = TRUE)),
     anycollege = as.integer(any(grepl("College", education))),
+    anyk12dropout = as.integer(any(grepl("Dropout", education))),
     anyschoolchild = as.integer(any(grepl("Currently", education))),
   ) %>% ungroup()
 
