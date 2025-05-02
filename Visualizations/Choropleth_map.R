@@ -7,9 +7,9 @@ options(tigris_use_cache = TRUE)
 ### --- Making the Datasets ---------------------------------------------------
 hh_new23 <- read.csv("Data/hh_first23.csv")
 
-hh_23_summary <- hh_23 %>%
+hh_23_summary <- hh_new23 %>%
   group_by(zip) %>%
-  summarise(
+  summarize(
     count = n()
     )
 
