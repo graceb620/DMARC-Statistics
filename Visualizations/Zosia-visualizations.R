@@ -284,7 +284,7 @@ hh_data24 <- read.csv("Data/amelia_hh2_2024.csv")
 multi_location_by_child <- hh_data24 %>%
   mutate(
     visited_multiple_locations = ifelse(visit_location_change == 1, "Multiple Locations", "One Location"),
-    has_child = ifelse(anyschoolchild == 1, "Has Child", "No Child")
+    has_child = ifelse(anyschoolchild == 1, "Yes", "No")
   ) %>%
   count(has_child, visited_multiple_locations) %>%
   group_by(has_child) %>%
@@ -297,7 +297,7 @@ ggplot(multi_location_by_child,
   geom_text(aes(label = paste0(round(percent, 1), "%")),
             position = position_dodge(width = 0.9),
             vjust = -0.3, size = 3) +
-  scale_fill_manual(values = c("Has Child" = "#E69F00", "No Child" = "#56B4E9")) +
+  scale_fill_manual(values = c("Yes" = "#0072B2", "No" = "#D55E00")) +
   labs(
     title = "Households Visiting Multiple Pantry Locations in 2024",
     x = "Pantry Visit Pattern",
