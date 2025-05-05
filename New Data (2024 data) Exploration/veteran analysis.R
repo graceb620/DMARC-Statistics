@@ -159,12 +159,12 @@ lr_ridge_coefs <- coef(lr_ridge_cv,s="lambda.min") %>% as.matrix
 
 test.df.preds<-test.df %>% 
   mutate(
-    lasso_pred=predict(final_lasso, x.test,type="response")[,1], #x.test needs to be ordered the same way as y.test
-    ridge_pred=predict(final_ridge, x.test,type="response")[,1], #x.test needs to be ordered the same way as y.test
+    lasso_pred=predict(final_lasso, x.test,type="response")[,1], 
+    ridge_pred=predict(final_ridge, x.test,type="response")[,1], 
   )
 
-ridge_rocCurve <- roc(response=(test.df.preds$anyveteran), #whatever you used as a y variable
-                      predictor=test.df.preds$ridge_pred, #predicted probs
+ridge_rocCurve <- roc(response=(test.df.preds$anyveteran),
+                      predictor=test.df.preds$ridge_pred, 
                       levels=c("0","1"))
 lasso_rocCurve<-roc(response=(test.df.preds$anyveteran),
                     predictor=test.df.preds$lasso_pred,

@@ -173,6 +173,10 @@ plot(lasso_rocCurve, print.thres = TRUE, print.auc = TRUE) #0.891 AUC
 
 #We'll use lasso for our interpretations, slightly higher, very small difference
 
+# Some of the interesting important variables are:
+# primary visitor occupation, median federal poverty level, visit_count_2024,
+# visit_location_chage
+
 # anyschoolchild only visualizations -----------------
 # Creating anyschoolchild only data set for visualizations
 hhschoolchild<-hh24%>%filter(anyschoolchild>0)
