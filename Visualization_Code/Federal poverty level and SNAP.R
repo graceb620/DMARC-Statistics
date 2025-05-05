@@ -12,7 +12,7 @@ quarter_count <- read.csv('Data/quarter_count2.csv', stringsAsFactors=FALSE)
 
 monthly_count<-monthly_count%>%filter(year(round_month)>=2020&year(round_month)<2025)
 quarter_count<-quarter_count%>%filter(year(round_quarter)>=2020&year(round_quarter)<2025)
-monthly_count$round_month <- as.Date(monthly_count$round_month) # I have no clue why round_quarter is a character 
+monthly_count$round_month <- as.Date(monthly_count$round_month) # I have no clue why round_month is a character 
 quarter_count$round_quarter <- as.Date(quarter_count$round_quarter) # I have no clue why round_quarter is a character 
 
 summary(quarter_count)

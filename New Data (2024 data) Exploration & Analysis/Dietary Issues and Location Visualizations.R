@@ -6,7 +6,7 @@ library(tidyverse)
 library(lubridate)
 library(scales)
 
-hh_data24 <- read.csv("Data/amelia_hh2_2024.csv")
+hh_data24 <- read.csv("Data/hh2_only2024calc.csv")
 hh_data2 <- read.csv("Data/hh_data2.csv")
 
 ### --- Making visualizations -------------------------------------------------
