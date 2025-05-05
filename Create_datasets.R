@@ -396,7 +396,7 @@ hh_first_visit_2023 <- hh_data %>%
 # Create a hh level dataset for all people who visited in 2023 ---------
 hh_23 <- hh_data %>%
   filter(year(last_visit) == 2023) %>%
-  select(afn, zip, n_people_in_household, first_visit, last_visit,
+  select(afn, zip, n_people_in_household, first_visit, last_visit, first_visit_2023,
          first_visit_zip, snap, snap_first_visit, snap_first_2023,
          snap_change_2023, snap_proportion_2023,snap_last_2023,
          income_first, income_last, income_2023, income_avg, 

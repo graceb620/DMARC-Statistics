@@ -100,3 +100,34 @@ ggplot(hh_summary, aes(x = factor(visit_year), y = proportion)) +
     y = "Percent of Households with Dietary Issues"
   ) +
   theme_minimal()
+
+### --- Visualizations on Location ----------------------------------------
+# Summarize and get top 5 locations
+hh_24_locations <- hh_data24 %>%
+  group_by(primary_visit_location) %>%
+  summarise(count = n()) %>%
+  slice_max(order_by = count, n = 5)
+
+# Plot the top 5
+ggplot(hh_24_locations, aes(x = reorder(primary_visit_location, count), y = count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(title = "Top 5 Visit Locations",
+       x = "Primary Visit Location",
+       y = "Count") +
+  coord_flip() +  # Makes the plot horizontal for readability
+  theme_minimal()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
