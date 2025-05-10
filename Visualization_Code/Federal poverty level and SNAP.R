@@ -6,6 +6,7 @@ library(tidyverse)
 
 rm(list=ls())
 
+hh_data_2023orig<-read.csv('Data/hh_data23.csv', stringsAsFactors=FALSE)
 hh_data_2023<-read.csv('Data/hh_data23.csv', stringsAsFactors=FALSE)
 monthly_count<-read.csv('Data/monthly_count2.csv', stringsAsFactors=FALSE)
 quarter_count <- read.csv('Data/quarter_count2.csv', stringsAsFactors=FALSE)
@@ -16,7 +17,7 @@ monthly_count$round_month <- as.Date(monthly_count$round_month) # I have no clue
 quarter_count$round_quarter <- as.Date(quarter_count$round_quarter) # I have no clue why round_quarter is a character 
 
 summary(quarter_count)
-#
+
 # # median income of households------
 # ggplot(hh_data_2023, aes(x = first_visit_2023, y = household_income_median, group=first_visit_2023)) + 
 #   geom_boxplot() 
@@ -42,9 +43,12 @@ summary(quarter_count)
 #        subtitle="between households who first visited in 2023 and who first visited earlier")
 
 
-# creating a category for ranges of federal poverty level --------
+# comparing counts of people on snap in first visit of 2023 vs last visit ------
 
-hh_data_2023<-read.csv('Data/hh_data23.csv', stringsAsFactors=FALSE)
+snap_diff<-sum(hh_data_2023$snap_last_2023)-sum(hh_data_2023$snap_first_2023)
+snap_diff
+
+# creating a category for ranges of federal poverty level --------
 
 hh_data_2023$poverty_cat <- cut(hh_data_2023$fed_poverty_level_first_visit,
                                 c(0,160,999))
@@ -72,7 +76,6 @@ hh_data_2023$poverty_cat <- factor(hh_data_2023$poverty_cat,
 
 hh_data_2023 <- hh_data_2023 %>% 
   mutate(poverty_cat=replace_na(as.character(poverty_cat),"Unknown Federal Poverty level"))
-
 
 # graphs for 2023 --------
 ggplot(hh_data_2023, aes(x = poverty_cat, fill = first_visit_2023)) +
@@ -130,6 +133,38 @@ ggplot(hh_data_2023, aes(x = poverty_cat, fill = snap_last_2023)) +
   ) + theme_light() + theme(axis.text.x = element_text(size = 11)) +
   scale_y_continuous(breaks = seq(0, max(table(hh_data_2023$poverty_cat)), by = 1000)) +
   scale_fill_brewer(palette = "Spectral") 
+
+#comparison of first vs last visit
+
+max_y <- hh_data_2023 %>%
+  count(snap_first_2023) %>%
+  pull(n) %>%
+  max()
+
+ggplot(hh_data_2023, aes(x = snap_last_2023)) +
+  geom_bar() +  
+  geom_text(stat = "count", aes(label = after_stat(count)), 
+            position = position_stack(vjust = 0.5), size = 4, color = "white") +
+  xlab("SNAP benefit categories") + 
+  ylab("Count of Households") +
+  labs(
+    title = "Count of households with SNAP benefits at time of LAST visit",
+    subtitle = "For Households That Visited DMARC Pantries in 2023"
+  ) + theme_light() + theme(axis.text.x = element_text(size = 11)) +
+  scale_y_continuous(limits = c(0, max_y),breaks = seq(0, max_y, by = 1000))
+
+#comparison of first vs last visit
+ggplot(hh_data_2023, aes(x = snap_first_2023)) +
+  geom_bar(color = "black") +  
+  geom_text(stat = "count", aes(label = after_stat(count)), 
+            position = position_stack(vjust = 0.5), size = 4, color = "white") +
+  xlab("SNAP benefit categories") + 
+  ylab("Count of Households") +
+  labs(
+    title = "Count of households with SNAP benefits at time of FIRST visit",
+    subtitle = "For Households That Visited DMARC Pantries in 2023"
+  ) + theme_light() + theme(axis.text.x = element_text(size = 11)) +
+  scale_y_continuous(breaks = seq(0, max_y, by = 1000)) 
 
 # graphs for over-time under threshold but no snap -------
 scale_factor <- max(quarter_count$num_nosnap_threshold, na.rm = TRUE) / 
