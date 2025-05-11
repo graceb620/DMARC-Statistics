@@ -1,21 +1,29 @@
-# Every row is a person visit combination
-# afn = household ID
-# served date = year-month-date 
-# annual_income = household income / doesn't make sense because it doesnt consider hhsize
-# federal_poverty_level / better to use because it considers hhsize 
-# lnm = first initial of last name
-# snap_household = if hh received snap
-# create 3 different data sets:
-#   visit level = 1 row per visit 
-#   hhlevel = people and visits 
-#   individual level = individuals
-# Subset zipcodes to the first 5 digits
+# Main contributor: Grace Bero
+# Other contributors: Amelia Burnell, Zofia Landowska, Lynette Ndibalekera
+
+# Goal: Create clean datasets for modeling 
 
 # Housekeeping Items -----------------------------------------------------------
 library(lubridate)
 library(tidyverse)
 library(dplyr)
 library(purrr)
+
+# Few notes about the raw data: 
+# - every row is a person visit combination
+# - afn = household ID
+# - served date = year-month-date 
+# - annual_income = household income (does not consider hhsize)
+# - federal_poverty_level (takes hhsize into consideration)
+# - lnm = first initial of last name
+# - snap_household = if hh received snap benefit
+
+# Goal: Create 3 different data sets:
+#   1. visit level 
+#   2. household level 
+#   3. individual level
+
+# Subset zipcodes to the first 5 digits
 
 # Create the main dataset from raw csv -----------------------------------------
 all <- read.csv("Data/drake_export_v8_2024-02-13_100754_rev2_nolatlong.csv")
@@ -30,7 +38,7 @@ all <- all %>%
 # 57 failed to parse - will have to deal with these on a case by case basis
 
 # Create datasets --------------------------------------------------------------
-# Create visit level dataset
+# Create a visit level dataset
 visit <- all %>% 
   group_by(afn, served_date) %>% 
   # in summarize, you need to really think about how to characterize a visit
@@ -49,7 +57,7 @@ visit <- all %>%
     round_quarter = round_date(served_date, "quarter"),
   )
 
-# create a visit count dataset
+# Create a visit count dataset
 monthly_count <- visit %>% 
   group_by(round_month) %>% 
   summarise(num_VISITS = n(), #num rows (visits)
@@ -75,7 +83,7 @@ quarter_count <- visit %>%
   )
 
   
-#creating monthly frequency variable
+# Create a monthly frequency variable
 
 monthly_household_frequency <- visit %>% 
   group_by(round_month,afn)  %>% 
@@ -85,7 +93,7 @@ monthly_household_frequency <- visit %>%
             
   )%>% 
   mutate(FREQ=ifelse(freq > 1,1,0)) 
-#this will help us if we want to analyze on a house-level
+# This will help us with a house-level analysis
 
 monthly_total_frequency <- monthly_household_frequency %>%
   group_by(round_month) %>% 
@@ -96,7 +104,8 @@ monthly_total_frequency <- monthly_household_frequency %>%
             num_households = length(unique(afn)),
             more_than_once=sum(FREQ)
   ) 
-#create day_of_the_week_variable
+
+# Create day_of_the_week variable
 
 all$day_of_the_week <- weekdays(all$served_date)
 head(all$day_of_the_week)
@@ -110,14 +119,15 @@ week_day_counts <- all %>%
 print(week_day_counts)  
 
 
-##Saturday and Sunday reflect the least number of visits
+##Saturday and Sunday reflect the least number of visits.
 ##Monday and Tuesday have the highest number of visits.
 
-##But there's 57 dates that failed to parse when we were cleaning dates
+## There were 57 dates that failed to parse when we were cleaning dates
 
-# HH LEVEL DATASETS INFO ----------
 
-## Create hh level dataset for ALL visits --------------
+# HH LEVEL DATASETS ------------------------------------------------------------
+
+## Create a household level dataset for ALL visits --------------
 
 hh_data <- all %>% 
   group_by(afn) %>% 
@@ -326,55 +336,15 @@ hh_data <- all %>%
   )
 
 summary(hh_data)
-  
-# Clean hh_data ----------------------------------------------------------------
-
-# # Convert blank strings to NA
-# hh_data <- hh_data %>% 
-#   mutate(across(c(afn, snap_household, homeless, family_type), ~na_if(., "")))
-# 
-# 
-# # Convert categorical variables to factors
-# hh_data <- hh_data %>% 
-#   mutate(
-#     snap_household = factor(snap_household, levels = c("N", "Y")),
-#     homeless = factor(homeless),
-#     family_type = factor(family_type)
-#   )
-# 
-# # Check for NA values in first_visit and last_visit
-# colSums(is.na(hh_data[c("first_visit", "last_visit")]))
-# # 0 NA's both in "First_visit" and "last_visit"
-# 
-# # Check whether last_visit is always after or equal to first_visit
-# # This will return TRUE if all valid (non-NA) cases satisfy the condition and FALSE otherwise.
-# all(hh_data$last_visit >= hh_data$first_visit, na.rm = TRUE)
-# # Returned TRUE
-# 
-# # Check for missing household IDs
-# sum(is.na(hh_data$afn))
-# # 1 missing value 
-# hh_data[is.na(hh_data$afn), ]
-# # Looks like an error ?
-# 
-# # Check summary after cleaning
-# summary(hh_data)
-# 
-# # Explore correlations or cross-tabulations between columns
-# # Is there a correlation between family type and housing situation
-# table(hh_data$family_type, hh_data$homeless)
-# table(hh_data$family_type, hh_data$homeless)
-# COMMENTING IT OUT FOR NOW FOR RUNNING DOCUMENT PURPOSES. CHANGE LATER
-#   - FROM: Grace
 
 ### Cleaning Removal of NA values
 # There are many NA values in these columns. This could be due to there being
-# no visits during those years. replacing with median of the value
+# no visits during those years - replacing with median of the value
 hh_data <- hh_data %>%
   mutate(across(starts_with("income_"), ~ coalesce(., household_income_median)),
          across(starts_with("fed_poverty_level_20"), ~ coalesce(., fed_poverty_level_median)))
 
-# Create a hh level dataset for all people who's first visit was 2023 ---------
+# Create a hh level dataset for all people who's first visit was 2023 ----------
 hh_first_visit_2023 <- hh_data %>%
   filter(year(first_visit) == 2023) %>%
   select(zip, afn, n_people_in_household, first_visit, last_visit,
@@ -393,7 +363,7 @@ hh_first_visit_2023 <- hh_data %>%
          elderly, child, working_age, college_education, 
          highest_education, kids, single_parent)
 
-# Create a hh level dataset for all people who visited in 2023 ---------
+# Create a hh level dataset for all people who visited in 2023 -----------------
 hh_23 <- hh_data %>%
   filter(year(last_visit) == 2023) %>%
   select(afn, zip, n_people_in_household, first_visit, last_visit, first_visit_2023,
@@ -411,7 +381,7 @@ hh_23 <- hh_data %>%
          elderly, child, working_age, college_education, 
          highest_education, kids, single_parent, first_visit_2023)
 
-# Create a hh level dataset for all people whose first visit was in 2022
+# Create a hh level dataset for all people whose first visit was in 2022 -------
 hh_first_visit_2022 <- hh_data %>%
   filter(year(first_visit) == 2022) %>%
   select(afn, n_people_in_household, first_visit, last_visit,
@@ -429,7 +399,7 @@ hh_first_visit_2022 <- hh_data %>%
          elderly, child, working_age, college_education, 
          highest_education, kids, single_parent)
 
-# Create a hh level dataset for all people who visited in 2022
+# Create a hh level dataset for all people who visited in 2022 -----------------
 hh_22 <- hh_data %>%
   filter(year(last_visit) == 2022) %>%
   select(afn, n_people_in_household, first_visit, last_visit,
@@ -447,7 +417,7 @@ hh_22 <- hh_data %>%
          elderly, child, working_age, college_education, 
          highest_education, kids, single_parent, first_visit_2022)
 
-# Create a hh level dataset for all people whose first visit was in 2021
+# Create a hh level dataset for all people whose first visit was in 2021 -------
 hh_first_visit_2021 <- hh_data %>%
   filter(year(first_visit) == 2021) %>%
   select(afn, n_people_in_household, first_visit, last_visit,
@@ -465,7 +435,7 @@ hh_first_visit_2021 <- hh_data %>%
          elderly, child, working_age, college_education, 
          highest_education, kids, single_parent)
 
-# Create a hh level dataset for all people who visited in 2021
+# Create a hh level dataset for all people who visited in 2021 -----------------
 hh_21 <- hh_data %>%
   filter(year(last_visit) == 2021) %>%
   select(afn, n_people_in_household, first_visit, last_visit,
@@ -483,7 +453,7 @@ hh_21 <- hh_data %>%
          elderly, child, working_age, college_education, 
          highest_education, kids, single_parent, first_visit_2021)
 
-
+# Save new datasets
 write.csv(hh_data, "Data/hh_data.csv", row.names = FALSE)
 write.csv(hh_first_visit_2023, "Data/hh_first23.csv", row.names = FALSE)
 write.csv(hh_23, "Data/hh_data23.csv", row.names = FALSE)

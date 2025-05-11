@@ -1,3 +1,4 @@
+# Main contributor: Zofia Landowska 
 rm(list=ls())
 library(tidyverse)
 library(RColorBrewer)
@@ -101,74 +102,3 @@ ggplot(importance_data, aes(x = reorder(Factors, Importance), y = Importance)) +
   theme_minimal()
 
 
-# THIS IS SOME BS
-
-# Partial Dependence Plots to further understand relationships
-# Example for 'household_income_median'
-pdp_income <- partial(rforest_tuned, pred.var = "household_income_median", prob = TRUE)
-plot_pdp_income <- plotPartial(pdp_income, main = "Partial Dependence of Household Income")
-print(plot_pdp_income)
-
-# Example for 'snap_change_2023'
-pdp_snap_change <- partial(rforest_tuned, pred.var = "snap_change_2023", prob = TRUE)
-plot_pdp_snap_change <- plotPartial(pdp_snap_change, main = "Partial Dependence of SNAP Change")
-print(plot_pdp_snap_change)
-
-# Add a section to analyze the distribution of important features
-# Example for household income
-ggplot(train.df, aes(x = household_income_median)) +
-  geom_histogram(bins = 30, fill = "skyblue", color = "black") +
-  labs(title = "Distribution of Household Income", x = "Household Income Median") +
-  theme_minimal()
-
-# Example for snap change (categorical)
-ggplot(train.df, aes(x = as.factor(snap_change_2023))) + # Treat as factor
-  geom_bar(fill = "lightgreen", color = "black") +
-  labs(title = "Distribution of SNAP Change 2023", x = "SNAP Change 2023 (0/1)") +
-  theme_minimal()
-
-# Look at people who have moved more than once 
-multi_movers <- hh_23 %>% 
-  filter(more_than_one_change_location == 1)
-
-# Plot 1: Household size distribution (up to 10 people)
-ggplot(multi_movers %>% filter(n_people_in_household <= 10), 
-       aes(x = n_people_in_household)) +
-  geom_histogram(binwidth = 1, fill = "#69b3a2", color = "black") +
-  labs(title = "Household Size (Up to 10 People) for Multi-Movers",
-       x = "Number of People in Household",
-       y = "Count")
-
-# Plot 2: SNAP usage
-ggplot(multi_movers, aes(x = factor(snap))) +
-  geom_bar(fill = "#f28500") +
-  labs(title = "SNAP Usage for Those Who Moved More Than Once",
-       x = "Received SNAP (0 = No, 1 = Yes)",
-       y = "Count")
-
-# Plot 3: First Homeless State
-ggplot(multi_movers, aes(x = first_homeless_state)) +
-  geom_bar(fill = "#b07aa1") +
-  labs(title = "First Homeless State Distribution",
-       x = "First Homeless State",
-       y = "Count") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-# Plot 4: Last Homeless State
-ggplot(multi_movers, aes(x = last_homeless_state)) +
-  geom_bar(fill = "#b07aa1") +
-  labs(title = "FLast Homeless State Distribution",
-       x = "Last Homeless State",
-       y = "Count") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-# Plot 5: Income over time
-ggplot(multi_movers, aes(x = income_first, y = income_last)) +
-  geom_point(alpha = 0.7, color = "#0072b2") +
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
-  labs(title = "Income First vs. Last Visit (Multi-Movers)",
-       x = "Income at First Visit",
-       y = "Income at Last Visit")
-
-# Save all plots to a PDF
-#ggsave("multi_mover_plots_23.pdf", width = 10, height = 8)
