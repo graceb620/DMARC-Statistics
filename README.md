@@ -1,7 +1,16 @@
 # Data Analytics Capstone 2025
 
 ## Project Overview
+For our Case Studies in Data Analytics class, we worked with data provided by DMARC food pantries. They are the biggest food pantry network in Iowa. There has been an increase in the number of unique first-time visitors in 2023.
 
+Our goal of this project was to investigate the data and provide insights for DMARC to understand their increasing number of overall visitors and first-time visitors.
+Additionally, we wanted to find answers to these questions:
+- What are the characteristics of first-time visitors?
+- What differentiates first-time visitors from returners?
+- What are some behaviors in households? Do they change based on the type of household?
+
+Initially, we only had data on each visit from 2018 to the beginning of 2024. However, we focused on data after 2020, because the data collection in 2018 and 2019 worked a bit different. In April, we received data for all of 2024, which also included more information like veteran status. 
+Because of the sensitive nature of this data, it is not accessible for the public. 
 
 ### Project Structure:
 
@@ -58,6 +67,11 @@
   - tidyr
   - caret
   - randomForest
+  - rpart
+  - rpart.plot
+  - logistf
+  - glmnet
+  - RColorBrewer
 
 ## Usage
 1. Clone the repository:
