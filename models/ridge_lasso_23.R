@@ -1,3 +1,4 @@
+# Main contributor: Zofia Landowska 
 rm(list=ls())
 library(tidyverse)
 library(caret) # For model evaluation
@@ -116,7 +117,7 @@ colnames(ridge_coefficients) <- "Coefficient"
 # View the coefficients
 print(ridge_coefficients)
 
-# add code to visualize coefficients
+# Visualize coefficients
 lasso_coef_plot <- ggplot(data = lasso_coefficients, aes(x = rownames(lasso_coefficients), y = Coefficient)) +
   geom_bar(stat = "identity", fill = "skyblue") +
   coord_flip() +
@@ -130,7 +131,7 @@ ridge_coef_plot <- ggplot(data = ridge_coefficients, aes(x = rownames(ridge_coef
 print(lasso_coef_plot)
 print(ridge_coef_plot)
 
-# We're gonna go with Lasso (a more interpretable model - fewer predictors kept)
+# We're going to go with Lasso (a more interpretable model - fewer predictors kept)
 # high sensitivity - good for catching all new households
 # high specificity - good for avoiding false positives
 
@@ -146,8 +147,6 @@ print(ridge_coef_plot)
 # 3. Consider creating tailored intake workflows for elderly or single-parent households since they tend to be recurring users.
 
 # Look at more than one change of location:
-
-# DOES NOT WORK
 
 # First-time visits by Change of Location
 hh_data_summary_change_location <- hh_data %>%

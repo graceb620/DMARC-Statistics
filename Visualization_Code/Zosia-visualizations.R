@@ -1,3 +1,4 @@
+# Main contributor: Zofia Landowska 
 rm(list=ls()) 
 source("Create_datasets.R") 
 source("DataSets2024.R") 
@@ -5,7 +6,8 @@ library(ggplot2)
 library(reshape2)
 library(RColorBrewer)
 
-#Proportion of First-Time Pantry Visits by Household Type
+
+# Visualize the Proportion of First-Time Pantry Visits by Household Type
 
 # Message: Shows the proportion of first-time visitors with and without children.
 # Why it’s useful: Helps identify trends in household demographics, informing decisions on how to allocate resources and address needs.
@@ -89,29 +91,6 @@ ggplot(hh_data_summary_single_parent_returners, aes(x = visit_year, y = percent,
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-
-# Used ChatGPT to help with formatting.
-
-# Additional Visualizations
-
-# Most common housing areas:
-
-top_zips <- visit %>%
-  count(zip, sort = TRUE) %>%
-  top_n(10, wt = n)
-
-
-# ggplot(top_zips, aes(x = reorder(zip, n), y = n)) +
-#   geom_col(fill = "#3498DB") +
-#   coord_flip() +
-#   labs(
-#     title = "Top 10 Zip Codes of Households Served",
-#     x = "Zip Code",
-#     y = "Number of Visits"
-#   ) +
-#   theme_minimal()
-
-
 # Distribution of Household Sizes
 ggplot(hh_data, aes(x = n_people_in_household)) +
   geom_histogram(binwidth = 1, fill = "#F39C12", color = "white") +
@@ -182,7 +161,8 @@ all %>%
   summarise(unique_households = n_distinct(afn),
             total_visits = n())
 
-#only one household visited this pantry ONLY ONCE
+# Only one household visited this pantry ONLY ONCE
+
 
 #Explore whether SNAP recipients are more or less likely to switch pantry locations.
 
@@ -274,11 +254,9 @@ ggplot(top_10_locations, aes(x = reorder(location, count), y = count)) +
   theme_minimal()
 
 
-
-
-
-
+# 2024 Data
 hh_data24 <- read.csv("Data/amelia_hh2_2024.csv")
+
 #Goal: Show how common it is for households to visit multiple pantry locations in 2024.
 # Cleaned and labeled data for plotting
 multi_location_by_child <- hh_data24 %>%
@@ -305,14 +283,6 @@ ggplot(multi_location_by_child,
     fill = "Household Has School-Age Child"
   ) +
   theme_minimal()
-
-
-
-
-
-
-
-
 
 
 

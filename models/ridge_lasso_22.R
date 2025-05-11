@@ -1,3 +1,4 @@
+# Main contributor: Zofia Landowska 
 rm(list=ls())
 library(tidyverse)
 library(caret) # For model evaluation
@@ -115,7 +116,7 @@ colnames(ridge_coefficients) <- "Coefficient"
 # View the coefficients
 print(ridge_coefficients)
 
-# add code to visualize coefficients
+# Visualize coefficients
 lasso_coef_plot <- ggplot(data = lasso_coefficients, aes(x = rownames(lasso_coefficients), y = Coefficient)) +
   geom_bar(stat = "identity", fill = "skyblue") +
   coord_flip() +

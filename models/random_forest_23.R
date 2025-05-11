@@ -1,3 +1,4 @@
+# Main contributor: Zofia Landowska 
 rm(list=ls())
 library(tidyverse)
 library(RColorBrewer)
