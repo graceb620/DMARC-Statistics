@@ -1,3 +1,10 @@
+### --- Modeling for First_visit_2024 -----------------------------------------
+# Primary Author: Grace Bero
+# 
+# This is a ridge, lasso, and random forest model that predicts whether a visitor
+# was a first time visitor in 2024. 
+
+# Load in the packages
 library(tidyverse)
 library(pROC)
 library(glmnet)

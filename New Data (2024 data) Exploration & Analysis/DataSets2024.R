@@ -1,3 +1,8 @@
+### --- 2024 Data set Creation -------------------------------------------------
+# Primary Authors: Grace Bero
+# 
+# This document was used to create datasets for the newer 2024 data. 
+
 library(lubridate)
 library(tidyverse)
 library(dplyr)

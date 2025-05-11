@@ -1,16 +1,21 @@
-source("API_Connections/API_Connection.R")
-### --- API Related Datasets ---------------------------------------------------
+### --- API Datasets -----------------------------------------------------------
+# Primary Authors:
+# 
+# This document is used to create the data sets for the API data. 
+
+source("API_Connections/API_Connection.R") # Run API_Connection.R, pull API data
+### --- Load in Packages -------------------------------------------------------
 library(lubridate)
 library(tidyverse)
 library(dplyr)
 library(purrr)
 
-# --- Merging the columns -----------------
+# --- Merging the columns -----------------------------------------------------
 API_data <- reduce(list(API_HH_Results, API_SNAP_Results), 
                    full_join, by = c("zip code tabulation area", 
                                      "year", "state", "NAME")) 
 
-# --- Creating large dataset
+# --- Creating large dataset -------------------------------------------------
 API_data <- API_data %>% rename(
   NumHH = B11001_001E,
   SnapHH = B22003_002E,
@@ -32,11 +37,11 @@ zipcodes_2019 <- API_HH_Results %>%
 API_data <- API_data %>% 
   filter(zip_code %in% zipcodes_2019$`zip code tabulation area`) 
 
-# --- Creating Datasets for each individual year -------
+# --- Creating Datasets for each individual year ------------------------------
 API_2023 <- API_data %>% filter(year==2023)
 
 
-# Creating CSV's 
+# --- Creating CSV's ----------------------------------------------------------
 write.csv(API_data, "Data/API_data.csv", row.names = FALSE)
 write.csv(API_2023, "Data/API_2023.csv", row.names = FALSE)
 

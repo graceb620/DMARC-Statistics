@@ -1,12 +1,16 @@
-### READ THIS: THis doc is not meant to be run,
-### There is a line that will run this doc on the Create_datasets.R
+### --- API Connection ---------------------------------------------------------
+# Primary Authors: Grace Bero
+# 
+# This doc is used to pull Data from the ACS API. 
+# NOTE: DO NOT run this document. It will be run in the API_Datasets.R document
 
-
-### --- Test --------------------------------------------------------------------
+### --- Load in Packages -------------------------------------------------------
 library(httr)
 library(jsonlite)
 library(dplyr)
 library(ggplot2)
+
+###--- SNAP Households Variable ------------------------------------------------
 
 # Base URL for ACS 5-Year Data
 BASE_URL <- "https://api.census.gov/data"
@@ -57,9 +61,9 @@ for (year in 2012:2023) {
 
 print(API_SNAP_Results)
 
-### --- ------------------------------------
+### --- Total Households Variable ---------------------------------------------
 # Choose the variable
-API_HH <- "B11001_001E"  # Number of SNAP households
+API_HH <- "B11001_001E"  # Number of  households
 
 # Initialize an empty dataframe to store results
 API_HH_Results <- data.frame()
