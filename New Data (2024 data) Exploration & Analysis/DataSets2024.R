@@ -1,6 +1,6 @@
 ### --- 2024 Data set Creation -------------------------------------------------
 # Primary Authors: Grace Bero
-# 
+# Additional contributor: Amelia Burnell
 # This document was used to create datasets for the newer 2024 data. 
 
 library(lubridate)
@@ -101,7 +101,7 @@ individuals <- all2 %>%
     incomeSource = first(incomeSource)
   )
 
-### --- Create a household level dataset: Grace ---------------------------------------
+### --- Create a household level dataset ---------------------------------------
 hh_data2 <- all2 %>% 
   group_by(houseHoldIdAfn) %>% 
   summarize(
@@ -135,9 +135,11 @@ hh2_2024 <- hh_data2 %>%
          annualIncome, foodstamps, primary_visit_location, primary_service,
          primary_visitor_occupation, dietary_issue, veteran)
 
-### --- Create a household level dataset for 2024: Amelia ---------------------------------------
+### --- Create a household level dataset for only 2024: Amelia Burnell ---------------------------------------
+# This dataset calculates values for households using only 2024 visits
 
 # General household-level summary (all years)
+# we need this to know when was their first visit
 hh_summary_all <- all2 %>%
   group_by(houseHoldIdAfn) %>%
   summarize(

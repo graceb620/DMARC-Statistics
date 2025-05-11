@@ -1,3 +1,12 @@
+# Main contributor: Amelia Burnell
+
+# Datasets used: (1) household information for 2023 visitors
+# (2) counts within months (3) counts within quarters
+
+# Goal: Focus on federal poverty level and SNAP analysis to
+# create meaningful visualizations that uncover valuable information about data
+
+# load libraries and datasets ------------
 library(ggplot2)
 library(dplyr)
 library(RColorBrewer)
@@ -13,8 +22,8 @@ quarter_count <- read.csv('Data/quarter_count2.csv', stringsAsFactors=FALSE)
 
 monthly_count<-monthly_count%>%filter(year(round_month)>=2020&year(round_month)<2025)
 quarter_count<-quarter_count%>%filter(year(round_quarter)>=2020&year(round_quarter)<2025)
-monthly_count$round_month <- as.Date(monthly_count$round_month) # I have no clue why round_month is a character 
-quarter_count$round_quarter <- as.Date(quarter_count$round_quarter) # I have no clue why round_quarter is a character 
+monthly_count$round_month <- as.Date(monthly_count$round_month) # round_month was a character 
+quarter_count$round_quarter <- as.Date(quarter_count$round_quarter) # round_quarter was a character 
 
 summary(quarter_count)
 
@@ -53,8 +62,7 @@ hh_data_2023 <- hh_data_2023 %>%
   mutate(poverty_cat=replace_na(as.character(poverty_cat),"Unknown Federal Poverty level"))
 
 # graphs for 2023: federal poverty level threshold analysis --------
-
-# Visited before 2023 vs first timer in 2023 --------
+# Visited before 2023 vs first timer in 2023
 # not easy to read and interpret meaningfully
 ggplot(hh_data_2023, aes(x = poverty_cat, fill = first_visit_2023)) +
   geom_bar(color = "black") +  
@@ -70,9 +78,7 @@ ggplot(hh_data_2023, aes(x = poverty_cat, fill = first_visit_2023)) +
   scale_y_continuous(breaks = seq(0, max(table(hh_data_2023$poverty_cat)), by = 1000)) +
   scale_fill_brewer(palette = "Accent") 
 
-# Whether they took out snap benefits at all -------
-
-# At the time of their FIRST visit:
+# Whether they took out SNAP at the time of their FIRST visit:
 ggplot(hh_data_2023, aes(x = poverty_cat, fill = snap_first_2023)) +
   geom_bar(color = "black") +  
   xlab("Threshold Categories") + 
@@ -86,7 +92,7 @@ ggplot(hh_data_2023, aes(x = poverty_cat, fill = snap_first_2023)) +
   scale_y_continuous(breaks = seq(0, max(table(hh_data_2023$poverty_cat)), by = 1000)) +
   scale_fill_brewer(palette = "Spectral") 
 
-#whether they took out snap benefits EVER:
+# Whether they took out SNAP benefits EVER:
 ggplot(hh_data_2023, aes(x = poverty_cat, fill = snap)) +
   geom_bar(color = "black") +  
   xlab("Threshold Categories") + 
@@ -100,7 +106,7 @@ ggplot(hh_data_2023, aes(x = poverty_cat, fill = snap)) +
   scale_y_continuous(breaks = seq(0, max(table(hh_data_2023$poverty_cat)), by = 1000)) +
   scale_fill_brewer(palette = "Spectral") 
 
-#whether they took out snap benefits their MOST RECENT visit:
+# Whether they took out snap benefits their MOST RECENT visit:
 ggplot(hh_data_2023, aes(x = poverty_cat, fill = snap_last_2023)) +
   geom_bar(color = "black") +  
   xlab("Threshold Categories") + 
@@ -113,6 +119,7 @@ ggplot(hh_data_2023, aes(x = poverty_cat, fill = snap_last_2023)) +
   ) + theme_light() + theme(axis.text.x = element_text(size = 11)) +
   scale_y_continuous(breaks = seq(0, max(table(hh_data_2023$poverty_cat)), by = 1000)) +
   scale_fill_brewer(palette = "Spectral") 
+
 
 # comparison of if they received SNAP at first time vs last -------------
 

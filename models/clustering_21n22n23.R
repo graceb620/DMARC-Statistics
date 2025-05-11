@@ -1,3 +1,15 @@
+# Main contributor: Amelia Burnell
+
+# Datasets used: (1) household information for 2023 visitors
+# (2) household information for only first time 2023 visitors
+# For 2022 and 2021 clusters, changed to respective dataset
+
+# Goal: Find general groups that represent 2023 visitors (and compare to 2022 and 2021)
+# and compare what parts of those groups are first visitors vs returners
+
+# For our final analysis, we did not use this. 
+# I was did find meaningful interpretations. 
+
 rm(list=ls()) 
 #load necessary libraries
 library(tidyverse)
@@ -22,8 +34,7 @@ hh_23X <-subset(hh_23,select=c(n_people_in_household,
 summary(hh_23X)
 
 #standardize the units 
-hh_23Xstand<-apply(hh_23X,2,function(x){(x-mean(x))/sd(x)}) #2 applies function to column, 1 applies function to rows
-#how many standard deviation from the mean is it
+hh_23Xstand<-apply(hh_23X,2,function(x){(x-mean(x))/sd(x)}) 
 summary(hh_23Xstand)
 
 #use an elbow plot to choose the number of clusters
@@ -38,9 +49,6 @@ ggplot()+
   geom_line(aes(x=1:max,y=wss))+
   geom_point(aes(x=1:max,y=wss))+
   scale_x_continuous(breaks=1:max)
-#where is our marginal gains really dropping off?
-#7 seems like a reasonable cutoff point
-#let's fit our k-means with k=7 clusters
 
 hh_23X_kmeans<-kmeans(hh_23Xstand,centers=4)
 
@@ -91,8 +99,7 @@ hh_first23X <-subset(hh_first23,select=c(n_people_in_household,
 summary(hh_first23X)
 
 #standardize the units 
-hh_first23Xstand<-apply(hh_first23X,2,function(x){(x-mean(x))/sd(x)}) #2 applies function to column, 1 applies function to rows
-#how many standard deviation from the mean is it
+hh_first23Xstand<-apply(hh_first23X,2,function(x){(x-mean(x))/sd(x)}) 
 summary(hh_first23Xstand)
 
 #use an elbow plot to choose the number of clusters
@@ -107,11 +114,8 @@ ggplot()+
   geom_line(aes(x=1:max,y=wss))+
   geom_point(aes(x=1:max,y=wss))+
   scale_x_continuous(breaks=1:max)
-#where is our marginal gains really dropping off?
-#7 seems like a reasonable cutoff point
-#let's fit our k-means with k=7 clusters
 
-hh_first23X_kmeans<-kmeans(hh_first23Xstand,centers=3)
+hh_first23X_kmeans<-kmeans(hh_first23Xstand,centers=3) # 3 seemed like a good cutoff
 
 #show how distributions of each of the features vary across clusters
 #first, add a column of clusters onto sb_X
@@ -155,13 +159,12 @@ hh_first22X <-subset(hh_first22,select=c(n_people_in_household,
 summary(hh_first22X)
 
 #standardize the units 
-hh_first22Xstand<-apply(hh_first22X,2,function(x){(x-mean(x))/sd(x)}) #2 applies function to column, 1 applies function to rows
+hh_first22Xstand<-apply(hh_first22X,2,function(x){(x-mean(x))/sd(x)}) 
 #how many standard deviation from the mean is it
 summary(hh_first22Xstand)
 
 #use an elbow plot to choose the number of clusters
-max<-15 #the maximum number of clusters that you think would be useful
-#we just want to learn more about our data
+max<-15
 wss<-(nrow(hh_first22Xstand)-1)*sum(apply(hh_first22Xstand,2,var))
 for(i in 2:max){
   wss[i]<-sum(kmeans(hh_first22Xstand,centers=i)$withinss)
@@ -171,9 +174,6 @@ ggplot()+
   geom_line(aes(x=1:max,y=wss))+
   geom_point(aes(x=1:max,y=wss))+
   scale_x_continuous(breaks=1:max)
-#where is our marginal gains really dropping off?
-#7 seems like a reasonable cutoff point
-#let's fit our k-means with k=7 clusters
 
 hh_first22X_kmeans<-kmeans(hh_first22Xstand,centers=3)
 
@@ -219,13 +219,12 @@ hh_first21X <-subset(hh_first21,select=c(n_people_in_household,
 summary(hh_first21X)
 
 #standardize the units 
-hh_first21Xstand<-apply(hh_first21X,2,function(x){(x-mean(x))/sd(x)}) #2 applies function to column, 1 applies function to rows
+hh_first21Xstand<-apply(hh_first21X,2,function(x){(x-mean(x))/sd(x)}) 
 #how many standard deviation from the mean is it
 summary(hh_first21Xstand)
 
-#use an elbow plot to choose the number of clusters
-max<-15 #the maximum number of clusters that you think would be useful
-#we just want to learn more about our data
+#elbow plot for number of clusters
+max<-15 
 wss<-(nrow(hh_first21Xstand)-1)*sum(apply(hh_first21Xstand,2,var))
 for(i in 2:max){
   wss[i]<-sum(kmeans(hh_first21Xstand,centers=i)$withinss)
@@ -235,9 +234,6 @@ ggplot()+
   geom_line(aes(x=1:max,y=wss))+
   geom_point(aes(x=1:max,y=wss))+
   scale_x_continuous(breaks=1:max)
-#where is our marginal gains really dropping off?
-#7 seems like a reasonable cutoff point
-#let's fit our k-means with k=7 clusters
 
 hh_first21X_kmeans<-kmeans(hh_first21Xstand,centers=3)
 
@@ -296,10 +292,10 @@ ggplot(hh_data1, aes(x=first_year, y = n_people_in_household, group=first_year))
   geom_boxplot() + xlab("First Visit") + ylab("Number of people in household") +
   labs(title="Comparison of federal poverty level",
        subtitle="between households of different first visit year")
-#Very minimal change
+# Very minimal change
 
 
-#Previous work:
+# Some exploration on median income: 
 
 # # There are a few outliers with median income above 200000 - remove them
 # hh_23out <- hh_data_2023 %>% 

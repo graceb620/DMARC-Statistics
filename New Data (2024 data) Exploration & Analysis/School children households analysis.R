@@ -1,3 +1,12 @@
+# Main contributor: Amelia Burnell
+
+# Dataset used: household information for only 2024 visits 
+# Our y variable is "anyschoolchild": 
+# whether a household has any children that are in school
+
+# This file creates a random forest, ridge, and lasso models 
+# Goal: for DMARC to understand this group better and give them better resources
+
 # Loading libraries and datasets ---------------
 
 library(ggplot2)
@@ -12,13 +21,11 @@ library(rpart.plot)
 library(logistf)
 library(glmnet)
 
-hh24<-read.csv('Data/amelia_hh2_2024.csv', stringsAsFactors=FALSE)
+hh24<-read.csv('Data/hh2_only2024calc.csv', stringsAsFactors=FALSE)
 
 # Random Forest Model --------------------
-# Our y variable is "anyschoolchild": whether a household has any children that are in school
 # Random Forest will allow us to create a "variable importance plot" that allows 
 # us see what variables help best to classify households with school children. 
-# This way, DMARC can understand this group better and give them better resources
 
 ### Prepare data for fitting predictive models 
 #make anyschoolchild a factor
@@ -34,7 +41,7 @@ train.idx<-sample(x=1:nrow(hh24forest),size=.7*nrow(hh24forest))
 train.df<-hh24forest[train.idx,]
 test.df<-hh24forest[-train.idx,]
 
-### Creating & tuning the forest 
+### Creating & tuning the forest
 ##Let's check what the OOB rate is for mtry=[1,18]
 
 #creating a dataframe that will keep all 18 values for our loop
@@ -80,13 +87,12 @@ rocCurve<-roc(response=test.df$anyschoolchild,
 
 plot(rocCurve,print.thres=TRUE,print.auc=TRUE)
 
-#If we set pi* to 0.147 
+#If we set pi* to 0.535
 #(we predict that a visitor is a anyschoolchild household if the probability of it being luxury is 0.14)
-#Our specificity is 0.959
-#Our sensitivity is 0.89
-#We'll predict that a visitor is a anyschoolchild household 62.6% of the time when it is actually anyschoolchild
-#We'll predict that a visitor is not a anyschoolchild household 71% of the time when it actually is 
-
+#Our sensitivity is 0.836
+#Our specificity is 0.831
+#We'll predict that a visitor household does NOT have a school child 83.6% of the time when it is not
+#We'll predict that a visitor household has a school child 83.1% of the time when it truly is 
 
 # Variable Importance Plot
 par(mfrow=c(1,1))
@@ -101,9 +107,12 @@ ggplot(data = vi) +
   labs(x="Variable Name", y="Mean Decrease Accuracy") + 
   ggtitle("Variable Importance Plot for Housholds with school children")
 
+# Some of the interesting important variables are:
+# primary visitor occupation, median federal poverty level, visit_count_2024,
+# visit_location_chage
 
 #Ridge/Lasso models -------------------
-hh24<-read.csv('Data/amelia_hh2_2024.csv', stringsAsFactors=FALSE)
+hh24<-read.csv('Data/hh2_only2024calc.csv', stringsAsFactors=FALSE)
 
 ### Prepare data for fitting predictive models 
 #make anyschoolchild a vector
@@ -171,16 +180,21 @@ plot(ridge_rocCurve, print.thres = TRUE, print.auc = TRUE) #0.891 AUC
 
 plot(lasso_rocCurve, print.thres = TRUE, print.auc = TRUE) #0.891 AUC 
 
-#We'll use lasso for our interpretations, slightly higher, very small difference
+#Use lasso for our interpretations, slightly higher, very small difference
 
-# Some of the interesting important variables are:
-# primary visitor occupation, median federal poverty level, visit_count_2024,
-# visit_location_chage
+# Interpretations -------------
+# coefficient for visit count is 0.0545732240  
+# Calculation: e^0.0545732240=1.0475
+# Interpretation: For every one increase in visit count, the odds of a household
+# having children increase by 4.75% over a household that does not have school children
+# holding all other household characteristics equal.
 
-# anyschoolchild only visualizations -----------------
+# coefficient for location change is 0.4894645278
+# Calculation: e^0.4894645278=1.467
+# Interpretation: If a household visited more than one location in 2024, the odds of them
+# having children increase by 46.7% over a household that did not, 
+# holding all other household characteristics equal.
+
+# Only visitor household with children visualizations - preperation -----------------
 # Creating anyschoolchild only data set for visualizations
 hhschoolchild<-hh24%>%filter(anyschoolchild>0)
-
-#Since primary visitor occupation was the most important:
-ggplot(hhschoolchild, aes(x=primary_visitor_occupation)) + 
-  geom_bar()

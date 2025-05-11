@@ -1,3 +1,11 @@
+# Main contributor: Amelia Burnell
+
+# Dataset used: household information for only 2024 visits 
+# Our y variable is "anyveteran": whether a household has any veteran members
+
+# This file creates a random forest, ridge, and lasso models 
+# Goal: for DMARC can understand this group better and give them better resources
+
 # Loading libraries and datasets ---------------
 
 library(ggplot2)
@@ -14,15 +22,11 @@ library(glmnet)
 
 rm(list=ls())
 
-hh24<-read.csv('Data/amelia_hh2_2024.csv', stringsAsFactors=FALSE)
-monthly_count2<-read.csv('Data/monthly_count2.csv', stringsAsFactors=FALSE)
-quarter_count2 <- read.csv('Data/quarter_count2.csv', stringsAsFactors=FALSE)
+hh24<-read.csv('Data/hh2_only2024calc.csv', stringsAsFactors=FALSE)
 
 # Random Forest Model --------------------
-# Our y variable is "anyveteran": whether a household has any veteran members
 # Random Forest will allow us to create a "variable importance plot" that allows 
 # us see what variables help best to classify veteran households. 
-# This way, DMARC can understand this group better and give them better resources
 
 ### Prepare data for fitting predictive models 
 #make veteran a factor
@@ -88,8 +92,8 @@ plot(rocCurve,print.thres=TRUE,print.auc=TRUE)
 #(we predict that a visitor is a veteran household if the probability of it being luxury is 0.14)
 #Our specificity is 0.959
 #Our sensitivity is 0.89
-#We'll predict that a visitor is a veteran household 62.6% of the time when it is actually veteran
-#We'll predict that a visitor is not a veteran household 71% of the time when it actually is 
+#We'll predict that a visitor is a veteran household 95.9% of the time when it actually is  
+#We'll predict that a visitor is NOT a veteran household 89% of the time when it is NOT
 
 
 # Variable Importance Plot
@@ -174,9 +178,8 @@ plot(ridge_rocCurve, print.thres = TRUE, print.auc = TRUE) #0.753 AUC
 
 plot(lasso_rocCurve, print.thres = TRUE, print.auc = TRUE) #0.754 AUC 
 
-#We'll use lasso for our interpretations, slightly higher, very small difference
+#Use lasso for interpretations, slightly higher, very small difference
 
-
-# Veteran only visualizations -----------------
+# Only visitor household with veterans visualizations preperation -----------------
 # Creating veteran only data set for visualizations
 hhvet<-hh24%>%filter(anyveteran>0)
