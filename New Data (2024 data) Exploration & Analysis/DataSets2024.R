@@ -24,9 +24,9 @@ summary(all2) # Checking to make sure that all of the columns are in the desired
 # format and of reasonable value 
 # Noticed that the age range was from -7974.49 and 2024 i want to check the entries
 # where the age is <0 and >120
-test <- all2 %>%
-  group_by(clientId) %>%
-  filter(age < 0 | age > 120)
+# test <- all2 %>%
+#   group_by(clientId) %>%
+#   filter(age < 0 | age > 120)
 
 # For cleaning age, although some might be obvious as to how they would be changed, 
 # the original data had some people >100 years old that were "currently pre-school or younger"
