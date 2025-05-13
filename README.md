@@ -125,7 +125,7 @@ We used this model to determine which variables are most strongly associated wit
 Lasso Regression: 
 Lasso regression is similar to Ridge but can also remove unnecessary variables by setting their coefficients to zero. We also used this model to determine which variables are most strongly associated with the likelihood of a household’s first visit in 2023/2022. We used it to identify key predictors while keeping the model simple. Like the other models, we evaluated performance using ROC curves and AUC.
 
-Knn Model: Final outputs and results from the model are in the models folder.
+Knn Model: Final outputs and results from the model are in the models folder. We used the model to predict new visitors and used the results to analyze the variable importance. Knn is a model that is used for prediction. I fine tuned it using different K values. We evaluated the model perfomance using a confusion matrix that showed the false positives, false negatives, true positives and true negatives. 
 
 ------------------------------------------------------------------------
 ## Authors
