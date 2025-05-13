@@ -116,12 +116,24 @@ NOTE: The data from the original project is not included in this repository due 
 ------------------------------------------------------------------------
 ### Models
 
-Knn : Final outputs and results from the model are in the models folder.
+Random Forest Model:
+We used a Random Forest model to predict whether a household had its first visit in 2023 or 2022. This model works by combining the results of many decision trees to make a final prediction. We tuned the model to handle class imbalance and adjusted parameters to improve accuracy. Important variables in the final model included SNAP participation, housing type, and household size.
+
+Ridge Regression:
+Ridge regression is a type of logistic regression that helps reduce overfitting by shrinking the model’s coefficients. We used cross-validation to choose the best regularization strength (lambda). This model helped us predict visit outcomes while keeping the influence of less important variables in check.
+
+Lasso Regression: 
+Lasso regression is similar to Ridge but can also remove unnecessary variables by setting their coefficients to zero. We used it to identify key predictors while keeping the model simple. Like the other models, we evaluated performance using ROC curves and AUC.
+
+Knn Model: Final outputs and results from the model are in the models folder.
 
 ------------------------------------------------------------------------
 ## Authors
 
--   Your Name - Data Analyst
+-   Grace Bero - Data Analyst
+-   Amelia Burnell - Data Analyst
+-   Zofia Landowska - Data Analyst
+-   Lynette Ndibalekera - Data Analyst
 
 ## License
 
