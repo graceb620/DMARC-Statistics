@@ -1,20 +1,70 @@
 # Data Analytics Capstone 2025
 
 ## Project Overview
+For our Case Studies in Data Analytics class, we worked with data provided by DMARC food pantries. They are the biggest food pantry network in Iowa. There has been an increase in the number of unique first-time visitors in 2023.
+
+Our goal of this project was to investigate the data and provide insights for DMARC to understand their increasing number of overall visitors and first-time visitors.
+Additionally, we wanted to find answers to these questions:
+- What are the characteristics of first-time visitors?
+- What differentiates first-time visitors from returners?
+- What are some behaviors in households? Do they change based on the type of household?
+
+Initially, we only had data on each visit from 2018 to the beginning of 2024. However, we focused on data after 2020, because the data collection in 2018 and 2019 worked a bit different. In April, we received data for all of 2024, which also included more information like veteran status. 
+Because of the sensitive nature of this data, it is not accessible for the public. 
 
 ### Project Structure:
 
 ```         
-├── 2024 Data Analysis
+├── Exploration & Analysis (2018-2023)
 │   ├── Code
-│   ├── Create Dataset
-│   ├── Models
-│   ├── Visualizations
+│       └── Create_dataset
+│       └── data_exploration
+│           └── annual_income
+│           └── create_variable_day_of_the_week
+│           └── create_variable_first_visit
+│           └── family_type
+│           └── first_map_2023
+│           └── housing_situation_map
+│           └── income_src
+│           └── small zipcode exploration
+│       └── models
+│           └── clustering21n22n23
+│           └── knn_model
+│           └── random_forest_22
+│           └── random_forest_23
+│           └── ridge_lasso_22
+│           └── ridge_lasso_23
+│       └── visualization_code
+│           └── API_Visualizations
+│           └── Choropleth_Maps
+│           └── Federal poverty level and SNAP
+│           └── Lynette-visualizations
+│           └── Visualizations on hh_data
+│           └── Zosia-visualizations
 │   └── Output
-│       └── visualization.png
-├── Up to 2023 Data Analysis
-│   ├── Code
+│           └── Choropleth__API_NonSNAP_HH.html
+│           └── Choropleth__NewHH.html
+│           └── Choropleth__ReturnerHH.html
+│           └── first snap.png
+│           └── last snap.png
+│           └── last snap.png
+│           └── SNAP at first visit.png
+│           └── snap first.png
+│           └── SNAP last visit.png
+│           └── snap last.png
+├── Exploration & Analysis (2024)
+│   ├── code
+│       └── DataSets2024
+│       └── models
+│           └── Ridge_firstvisit2024
+│           └── School children households analysis
+│           └── Veteran households analysis
+│       └── visualizations_code
+│           └── Dietary Issues and Income Visualizations
+│           └── Dietary Issues and Location Visualizations
 │   └── Output
+│           └── schoolchild_variableimportance.png
+│           └── veteran_variableimportance.png
 └── README.md
 ```
 
